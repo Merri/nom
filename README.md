@@ -118,7 +118,7 @@ function todo(state) {
     
     // nom.text is to be deprecated
     formSubmitText = nom.text(function() {
-        return 'Add #' + state.items.length;
+        return 'Add #' + (1 + state.items.length);
     });
     
     formSubmitButton = nom.el('button', function() {
