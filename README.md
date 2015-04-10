@@ -82,10 +82,6 @@ function todo(state) {
         this.done = event.target.checked;
     }
     
-    function visible(count, item) {
-        return count + !item.hidden;
-    }
-    
     function nomListItem(item) {
         var itemCheckbox, itemContainer, itemTitle;
         // currently the best way to keep account of array items is to cache Nom elements to the array items
@@ -122,7 +118,7 @@ function todo(state) {
     
     // nom.text is to be deprecated
     formSubmitText = nom.text(function() {
-        return 'Add #' + state.items.reduce(visible, 1);
+        return 'Add #' + state.items.length;
     });
     
     formSubmitButton = nom.el('button', function() {
