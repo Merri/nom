@@ -1,0 +1,221 @@
+<!DOCTYPE html><!--[if IE]><![endif]-->
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Nom todo</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-shim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-sham.min.js"></script>
+        <![endif]-->
+        <style>
+header {
+    background: #eeb;
+    display: inline-block;
+    font-size: 0.75em;
+    padding: 0 1em;
+}
+
+hr {
+    border: 0 solid #333;
+    border-top-width: 2px;
+    height: 0;
+    margin: 1em;
+}
+
+strong {
+    color: #A00;
+    display: block;
+    font-size: 0.65em;
+    text-align: right;
+}
+
+/* https://github.com/muut/riotjs/blob/gh-pages/demo/todo.css */
+html {
+    font-family: 'myriad pro', sans-serif;
+    font-size: 1.25em;
+    border: 0;
+}
+
+body {
+    display: block;
+    max-width: 30em;
+    margin: 1% auto;
+}
+
+form input {
+    font-size: 100%;
+    padding: .6em;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    background-color: #1FADC5;
+    border: 1px solid rgba(0,0,0,.2);
+    font-size: 100%;
+    color: #fff;
+    padding: .6em 1.2em;
+    border-radius: 3em;
+    cursor: pointer;
+    margin: 0 .3em;
+    outline: none;
+}
+
+button[disabled] {
+    background-color: #ddd;
+    color: #aaa;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    padding: .2em 0;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: #ccc;
+}
+
+label {
+    cursor: pointer;
+}
+        </style>
+        <script>
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+
+// MIT license
+
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+        </script>
+        <script src="../nom.js"></script>
+    </head>
+    <body>
+        <aside>
+            <small><a href="http://muut.github.io/riotjs/demo/">Original Riot 2 demo</a></small>
+        </aside>
+        <hr />
+        <script>
+function todo(state) {
+    var formSubmitButton, formSubmitText, formTodoInput;
+
+    // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
+    state = {
+        items: (state.items || []).map(function(item) {
+            return { title: item.title || '', done: !!item.done }
+        }),
+        text: state.text || '',
+        title: state.title || ''
+    };
+
+    function add(event) {
+        event.preventDefault();
+        if (!state.text) return;
+        state.items.push({ title: state.text });
+        state.text = this.todoInput.value = '';
+        this.todoInput.focus();
+    }
+
+    function edit(event) {
+        state.text = event.target.value;
+    }
+
+    function toggle(event) {
+        this.done = event.target.checked;
+    }
+
+    function nomListItem(item) {
+        var itemCheckbox, itemContainer, itemTitle;
+        // currently the best way to keep account of array items is to cache Nom elements to the array items
+        if (item.nom) return item.nom;
+
+        itemCheckbox = nom.el('input', function() {
+            return {
+                type: 'checkbox',
+                checked: item.done,
+                onclick: toggle.bind(item)
+            }
+        });
+
+        // nom.text is to be deprecated
+        itemTitle = nom.text(function() { return ' ' + item.title });
+
+        itemContainer = nom.el('label', function() {
+            return {
+                className: item.done ? 'completed' : '',
+                children: [ itemCheckbox, itemTitle ]
+            }
+        });
+
+        return item.nom = nom.el('li', { children: itemContainer })
+    }
+
+    formTodoInput = nom.el('input', {
+        name: 'todoInput',
+        onchange: edit,
+        oninput: edit,
+        onkeyup: edit,
+        onpaste: edit
+    });
+
+    // nom.text is to be deprecated
+    formSubmitText = nom.text(function() {
+        return 'Add #' + (1 + state.items.length);
+    });
+
+    formSubmitButton = nom.el('button', function() {
+        return { disabled: !state.text, children: formSubmitText }
+    });
+
+    return nom.mount(
+        nom.el('h3', { textContent: state.title }),
+        nom.el('ul', function() {
+            return { children: state.items.map(nomListItem) }
+        }),
+        nom.el('form', { onsubmit: add, children: [ formTodoInput, formSubmitButton ] })
+    );
+}
+
+document.body.appendChild(nom.mount(
+    todo({
+        title: 'I want to behave!',
+        items: [
+            { title: 'Avoid excessive caffeine', done: true },
+            { title: 'Be less provocative' },
+            { title: 'Be nice to people' }
+        ]
+    })
+));
+        </script>
+    </body>
+</html>
