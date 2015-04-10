@@ -155,11 +155,10 @@ function todo(state) {
     }
 
     function nomListItem(item) {
-        var itemCheckbox, itemContainer, itemTitle;
         // currently the best way to keep account of array items is to cache Nom elements to the array items
         if (item.nom) return item.nom;
 
-        itemCheckbox = nom.el('input', function() {
+        var itemCheckbox = nom.el('input', function() {
             return {
                 type: 'checkbox',
                 checked: item.done,
@@ -167,17 +166,14 @@ function todo(state) {
             }
         });
 
-        // nom.text is to be deprecated
-        itemTitle = nom.text(function() { return ' ' + item.title });
-
-        itemContainer = nom.el('label', function() {
-            return {
-                className: item.done ? 'completed' : '',
-                children: [ itemCheckbox, itemTitle ]
-            }
-        });
-
-        return item.nom = nom.el('li', { children: itemContainer })
+        return item.nom = nom.el('li', {
+            children: nom.el('label', function() {
+                return {
+                    className: item.done ? 'completed' : '',
+                    children: [ itemCheckbox, ' ' + item.title ]
+                }
+            })
+        })
     }
 
     formTodoInput = nom.el('input', {
@@ -188,13 +184,8 @@ function todo(state) {
         onpaste: edit
     });
 
-    // nom.text is to be deprecated
-    formSubmitText = nom.text(function() {
-        return 'Add #' + (1 + state.items.length);
-    });
-
     formSubmitButton = nom.el('button', function() {
-        return { disabled: !state.text, children: formSubmitText }
+        return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
     });
 
     return nom.mount(
