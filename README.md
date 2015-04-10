@@ -33,7 +33,7 @@ Passing an object is more performant to use, but it also means you have to creat
 
 Function allows for a bit more compact code as you don't need to create a variable to be able to change properties or child elements of an element.
 
-`children` allows a single element or an array of elements. Elements don't need to be created using Nom.
+`children` allows a single element or an array of elements. Elements don't need to be created using Nom. Strings are also accepted and will result in text nodes.
 
 ## `nom.mount()`
 
@@ -49,21 +49,19 @@ In short Nom doesn't force it's way: if you want to manually control refresh of 
 
 ## Creating components
 
-You can use Nom's features whichever way you see fit, but here is one way that is very similar to how Riot does things.
+You can use Nom's features whichever way you see fit, but here is one way that is very similar to how Riot does things. Below you can see a recoding of [Riot todo example](http://muut.github.io/riotjs/demo/) with Nom instead.
 
 ```js
-// NOTE: this may be outdated as things are still finding their way
-// this is a redesign of [Riot todo example](http://muut.github.io/riotjs/demo/)
 function todo(state) {
     var formSubmitButton, formSubmitText, formTodoInput;
-    
+
     // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
     state = {
         items: (state.items || []).map(function(item) {
             return { title: item.title || '', done: !!item.done }
         }),
         text: state.text || '',
-        title: state.title
+        title: state.title || ''
     };
 
     function add(event) {
@@ -73,41 +71,37 @@ function todo(state) {
         state.text = this.todoInput.value = '';
         this.todoInput.focus();
     }
-    
+
     function edit(event) {
         state.text = event.target.value;
     }
-    
+
     function toggle(event) {
         this.done = event.target.checked;
     }
-    
+
     function nomListItem(item) {
-        var itemCheckbox, itemContainer, itemTitle;
         // currently the best way to keep account of array items is to cache Nom elements to the array items
         if (item.nom) return item.nom;
-        
-        itemCheckbox = nom.el('input', function() {
+
+        var itemCheckbox = nom.el('input', function() {
             return {
                 type: 'checkbox',
                 checked: item.done,
                 onclick: toggle.bind(item)
             }
         });
-        
-        // nom.text is to be deprecated
-        itemTitle = nom.text(function() { return ' ' + item.title });
-        
-        itemContainer = nom.el('label', function() {
-            return {
-                className: item.done ? 'completed' : '',
-                children: [ itemCheckbox, itemTitle ]
-            }
-        });
-        
-        return item.nom = nom.el('li', { children: itemContainer })
+
+        return item.nom = nom.el('li', {
+            children: nom.el('label', function() {
+                return {
+                    className: item.done ? 'completed' : '',
+                    children: [ itemCheckbox, ' ' + item.title ]
+                }
+            })
+        })
     }
-    
+
     formTodoInput = nom.el('input', {
         name: 'todoInput',
         onchange: edit,
@@ -115,16 +109,11 @@ function todo(state) {
         onkeyup: edit,
         onpaste: edit
     });
-    
-    // nom.text is to be deprecated
-    formSubmitText = nom.text(function() {
-        return 'Add #' + (1 + state.items.length);
-    });
-    
+
     formSubmitButton = nom.el('button', function() {
-        return { disabled: !state.text, children: formSubmitText }
+        return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
     });
-    
+
     return nom.mount(
         nom.el('h3', { textContent: state.title }),
         nom.el('ul', function() {
@@ -148,7 +137,7 @@ document.body.appendChild(nom.mount(
 
 [Working sample at CodePen](http://codepen.io/Merri/full/YPbwBB/).
 
-Length of this example can be greatly reduced by using ES2015 as it allows lambda syntax for functions. Of course that means you need to use a preprocessor as browser support for the new EcmaScript standard isn't complete yet. In future the length will go down a bit as `nom.text` hasn't been removed as it's replacement solution isn't written just yet.
+Length of this example can be greatly reduced by using ES2015 as it allows lambda syntax for functions. Of course that means you need to use a preprocessor as browser support for the new EcmaScript standard isn't complete yet.
 
 # Requirements
 
