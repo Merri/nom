@@ -149,3 +149,12 @@ document.body.appendChild(nom.mount(
 [Working sample at CodePen](http://codepen.io/Merri/full/YPbwBB/).
 
 Length of this example can be greatly reduced by using ES2015 as it allows lambda syntax for functions. Of course that means you need to use a preprocessor as browser support for the new EcmaScript standard isn't complete yet. In future the length will go down a bit as `nom.text` hasn't been removed as it's replacement solution isn't written just yet.
+
+# Requirements
+
+These are more like recommendations than hard requirements. You'll simply get broader browser support. With no help Nom is IE10+ and Android 4.4+.
+
+1. es5shim
+2. requestAnimationFrame polyfill
+
+[Can I Use... requestAnimationFrame](http://caniuse.com/#search=requestanimationframe) shows quite a good approximation of the minimum browser support without any aid.
