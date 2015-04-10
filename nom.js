@@ -1,8 +1,6 @@
-/* Nom version 0.0.2, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.3, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(isSupportedBrowser) {
-    var nom = { version: '0.0.2' };
-
-    'use strict';
+    var nom = { version: '0.0.3' };
 
     // TODO: behave better when not in a modern browser environment, now always errors
     var noOp = function(){};
@@ -14,7 +12,7 @@
 
         if (obj == null) return obj;
 
-        if (obj instanceof Node)
+        if (obj instanceof Node && !obj.render)
             obj.render = function() {
                 var node = obj.firstChild;
 
@@ -42,15 +40,26 @@
             value = props[prop];
 
             if (prop === 'children' && obj.childNodes) {
+                node = true;
                 nodeIndex = 0;
                 nodes = Array.isArray(value) ? Array.prototype.concat.apply([], value) : [value];
-
-                while( (node = nodes[nodeIndex++]) && !(node instanceof Node));
 
                 existingNode = obj.firstChild;
 
                 while (existingNode) {
-                    if (Object.prototype.toString.call(existingNode.render) === '[object Function]') {
+                    if (node === true)
+                        while( (node = nodes[nodeIndex++]) && !(typeof node === 'string' || node instanceof Node));
+
+                    if (typeof node === 'string') {
+                        if (existingNode.nodeType === Node.TEXT_NODE) {
+                            if (existingNode.nodeValue !== node) existingNode.nodeValue = node;
+                            existingNode = existingNode.nextSibling;
+                        } else {
+                            obj.insertBefore(document.createTextNode(node), existingNode);
+                        }
+
+                        node = true;
+                    } else if (Object.prototype.toString.call(existingNode.render) === '[object Function]') {
                         if (!node) {
                             nodesToRemove.push(existingNode);
                             existingNode = existingNode.nextSibling;
@@ -60,7 +69,7 @@
                             else
                                 existingNode = existingNode.nextSibling;
 
-                            while( (node = nodes[nodeIndex++]) && !(node instanceof Node));
+                            node = true;
                         }
                     } else
                         existingNode = existingNode.nextSibling;
@@ -70,7 +79,8 @@
                     obj.removeChild(nodesToRemove.pop());
 
                 while (nodes.length >= nodeIndex) {
-                    if (node instanceof Node) obj.appendChild(node);
+                    if (typeof node === 'string') obj.appendChild(document.createTextNode(node));
+                    else if (node instanceof Node) obj.appendChild(node);
                     node = nodes[nodeIndex++];
                 }
 
@@ -133,21 +143,6 @@
         requestAnimationFrame(render);
 
         return fragment;
-    } : noOp;
-
-    // TODO: remove once can pass strings directly as children
-    nom.text = isSupportedBrowser ? function nomText(text) {
-        var node, originalText = text;
-
-        if (Object.prototype.toString.call(text) === '[object Function]') {
-            node = document.createTextNode(text());
-            node.render = function() { text = originalText(); if (node.nodeValue !== text) node.nodeValue = text; }
-        } else {
-            node = document.createTextNode(text);
-            node.render = function() { if(node.nodeValue !== originalText) node.nodeValue = originalText; }
-        }
-
-        return node;
     } : noOp;
 
     // support CommonJS
