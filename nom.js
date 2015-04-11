@@ -6,7 +6,7 @@
     var noOp = function(){};
     var htmlToDOM = isSupportedBrowser ? document.createElement('div') : noOp;
 
-    function render(obj, props) {
+    function render(obj, props, staticProps) {
         var item, originalProps = props, prop, value,
             existingNode, node, nodeIndex, nodes, nodesToRemove = [];
 
@@ -16,7 +16,7 @@
             obj.render = function() {
                 var node = obj.firstChild;
 
-                render(obj, originalProps);
+                if (!staticProps) render(obj, originalProps);
 
                 while (node) {
                     if (Object.prototype.toString.call(node.render) === '[object Function]')
@@ -27,7 +27,7 @@
             };
 
         if (Object.prototype.toString.call(props) === '[object Function]')
-            props = props();
+            props = props.bind(obj)();
         else if (typeof props === 'string' && props.charCodeAt(0) === 0x7B) // = '{'
             props = JSON.parse(props);
 
@@ -97,8 +97,8 @@
         return obj;
     }
 
-    nom.el = isSupportedBrowser ? function nomElement(element, props) {
-        return render(typeof element !== 'string' ? element : document.createElement(element), props);
+    nom.el = isSupportedBrowser ? function nomElement(element, props, staticProps) {
+        return render(typeof element !== 'string' ? element : document.createElement(element), props, staticProps);
     } : noOp;
 
     nom.mount = isSupportedBrowser ? function nomMount(nodes) {

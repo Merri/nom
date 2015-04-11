@@ -127,35 +127,35 @@ label {
         <hr />
         <script>
 function todo(state) {
-    var formSubmitButton, formTodoInput;
+    var formSubmitButton, formTodoInput
 
     // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
     state = {
-        items: (state.items || []).map(function(item) {
+        items: !Array.isArray(state.items) ? [] : state.items.map(function(item) {
             return { title: item.title || '', done: !!item.done }
         }),
-        text: state.text || '',
-        title: state.title || ''
-    };
+        text: typeof state.text === 'string' ? state.text : '',
+        title: String(state.title)
+    }
 
     function add(event) {
-        event.preventDefault();
-        if (!state.text) return;
-        state.items.push({ title: state.text });
-        state.text = this.todoInput.value = '';
-        this.todoInput.focus();
+        event.preventDefault()
+        if (!state.text) return
+        state.items.push({ title: state.text })
+        state.text = this.todoInput.value = ''
+        this.todoInput.focus()
     }
 
     function edit(event) {
-        state.text = event.target.value;
+        state.text = event.target.value
     }
 
     function toggle(event) {
-        this.done = event.target.checked;
+        this.done = event.target.checked
     }
 
     function nomListItem(item) {
-        if (item.nom) return item.nom;
+        if (item.nom) return item.nom
 
         var itemCheckbox = nom.el('input', function() {
             return {
@@ -163,7 +163,7 @@ function todo(state) {
                 checked: item.done,
                 onclick: toggle.bind(item)
             }
-        });
+        })
 
         return item.nom = nom.el('li', {
             children: nom.el('label', function() {
@@ -172,7 +172,7 @@ function todo(state) {
                     children: [ itemCheckbox, ' ' + item.title ]
                 }
             })
-        })
+        }, true)
     }
 
     formTodoInput = nom.el('input', {
@@ -181,19 +181,19 @@ function todo(state) {
         oninput: edit,
         onkeyup: edit,
         onpaste: edit
-    });
+    }, true)
 
     formSubmitButton = nom.el('button', function() {
         return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
-    });
+    })
 
     return nom.mount(
-        nom.el('h3', { textContent: state.title }),
+        nom.el('h3', { children: state.title }, true),
         nom.el('ul', function() {
             return { children: state.items.map(nomListItem) }
         }),
         nom.el('form', { onsubmit: add, children: [ formTodoInput, formSubmitButton ] })
-    );
+    )
 }
 
 document.body.appendChild(
@@ -205,7 +205,7 @@ document.body.appendChild(
             { title: 'Be nice to people' }
         ]
     })
-);
+)
         </script>
     </body>
 </html>
