@@ -127,7 +127,7 @@ label {
         <hr />
         <script>
 function todo(state) {
-    var formSubmitButton, formSubmitText, formTodoInput;
+    var formSubmitButton, formTodoInput;
 
     // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
     state = {
@@ -155,7 +155,6 @@ function todo(state) {
     }
 
     function nomListItem(item) {
-        // currently the best way to keep account of array items is to cache Nom elements to the array items
         if (item.nom) return item.nom;
 
         var itemCheckbox = nom.el('input', function() {
@@ -197,7 +196,7 @@ function todo(state) {
     );
 }
 
-document.body.appendChild(nom.mount(
+document.body.appendChild(
     todo({
         title: 'I want to behave!',
         items: [
@@ -206,7 +205,7 @@ document.body.appendChild(nom.mount(
             { title: 'Be nice to people' }
         ]
     })
-));
+);
         </script>
     </body>
 </html>

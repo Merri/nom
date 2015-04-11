@@ -1,15 +1,15 @@
 # Nom
 
-Nom (or nom.js or NomJS) is a new DOM library. Unlike the inspiration ([React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/)) it only focuses to the DOM. Nom makes no effort to support neat HTML-like input. This means that you can just go ahead and include Nom into a page and start doing things with it since there are no precompile requirements. You can do this with React too, but with React you get so much more than you probably need for a smaller project.
+Nom (or nom.js or NomJS) is a new DOM library. Unlike the inspiration ([React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/)) it only focuses to the DOM. Nom makes no effort to support neat HTML-like input. It doesn't provide a virtual DOM or components either. However Nom gives you the minimum you need to build DOM tree easily in just JavaScript.
 
-Riot 2 in the other hand provides you a lot of stuff in compact code. Things like tag files (= mixed HTML and JS), server side rendering, routes, observables and so on. Riot gives a great simplified point of view to doing UI programming. It is faster to pick up than React, but unlike React it explicitly forces you to the precompile world.
+Nom's major weakness is that it relies on mutable objects. Unlike React or Riot you don't have a single render function and each element instead "updates itself". Update flow does happen from parent to children.
 
 ## Nom is...
 1. Close to the standards: it spits out DOM element nodes and you directly modify DOM elements.
 2. Minimal in it's approach: at the moment of writing Nom provides only two methods (`nom.el()` and `nom.mount()`).
-3. Performant. Riot focuses to compact code, Nom is compact too, but with more focus to performance.
+3. Performant. Riot focuses to minimalism, Nom is minimalist as well, but with more focus to performance.
 4. Compatible. You can use other tools to screw the DOM and Nom will adapt.
-5. Unfinished: there are still many experiments and figuring outs to do.
+5. Unfinished: there are still many experiments and figuring outs to do. Things like "does this make sense at all".
 
 ## `nom.el()`
 
@@ -53,7 +53,7 @@ You can use Nom's features whichever way you see fit, but here is one way that i
 
 ```js
 function todo(state) {
-    var formSubmitButton, formSubmitText, formTodoInput;
+    var formSubmitButton, formTodoInput;
 
     // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
     state = {
@@ -81,7 +81,6 @@ function todo(state) {
     }
 
     function nomListItem(item) {
-        // currently the best way to keep account of array items is to cache Nom elements to the array items
         if (item.nom) return item.nom;
 
         var itemCheckbox = nom.el('input', function() {
@@ -123,7 +122,7 @@ function todo(state) {
     );
 }
 
-document.body.appendChild(nom.mount(
+document.body.appendChild(
     todo({
         title: 'I want to behave!',
         items: [
@@ -132,7 +131,7 @@ document.body.appendChild(nom.mount(
             { title: 'Be nice to people' }
         ]
     })
-));
+);
 ```
 
 [Working sample at CodePen](http://codepen.io/Merri/full/YPbwBB/).
