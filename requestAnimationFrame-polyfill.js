@@ -2,7 +2,7 @@
 
 !function(w, raf, caf){
     var lastTime = 0, vendor, vendors = ['o', 'moz', 'ms', 'webkit']
-    while (!w[raf] && vendor = vendors.pop()) {
+    while (!w[raf] && (vendor = vendors.pop())) {
         w[raf] = w[vendor + 'R' + raf.slice(1)]
         w[caf] = w[vendor + 'C' + caf.slice(1)] || w[vendor + 'CancelR' + raf.slice(1)]
     }
