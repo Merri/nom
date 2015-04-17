@@ -1,10 +1,10 @@
-/* Nom version 0.0.3, @license MIT, (c) 2015 Vesa Piittinen */
-;(function(isSupportedBrowser) {
-    var nom = { version: '0.0.3' };
+/* Nom version 0.0.4, @license MIT, (c) 2015 Vesa Piittinen */
+;(function(isBrowser, hasNode, hasRAF) {
+    function returnNull() { return null; }
+    var nom = { el: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.4' };
+    if (!isBrowser || !hasRAF) return nom;
 
-    // TODO: behave better when not in a modern browser environment, now always errors
-    var noOp = function(){};
-    var htmlToDOM = isSupportedBrowser ? document.createElement('div') : noOp;
+    var htmlToDOM = document.createElement('div');
 
     function render(obj, props, staticProps) {
         var item, originalProps = props, prop, value,
@@ -12,7 +12,7 @@
 
         if (obj == null) return obj;
 
-        if (obj instanceof Node && !obj.render)
+        if ((hasNode ? obj instanceof Node : obj.nodeType > 0) && !obj.render)
             obj.render = function() {
                 var node = obj.firstChild;
 
@@ -48,10 +48,13 @@
 
                 while (existingNode) {
                     if (node === true)
-                        while( (node = nodes[nodeIndex++]) && !(typeof node === 'string' || node instanceof Node));
+                        while(
+                            (node = nodes[nodeIndex++]) &&
+                            !(typeof node === 'string' || (hasNode ? node instanceof Node : node.nodeType > 0))
+                        );
 
                     if (typeof node === 'string') {
-                        if (existingNode.nodeType === Node.TEXT_NODE) {
+                        if (existingNode.nodeType === 3) {
                             if (existingNode.nodeValue !== node) existingNode.nodeValue = node;
                             existingNode = existingNode.nextSibling;
                         } else {
@@ -80,7 +83,7 @@
 
                 while (nodes.length >= nodeIndex) {
                     if (typeof node === 'string') obj.appendChild(document.createTextNode(node));
-                    else if (node instanceof Node) obj.appendChild(node);
+                    else if (hasNode ? node instanceof Node : node.nodeType > 0) obj.appendChild(node);
                     node = nodes[nodeIndex++];
                 }
 
@@ -97,11 +100,11 @@
         return obj;
     }
 
-    nom.el = isSupportedBrowser ? function nomElement(element, props, staticProps) {
+    nom.el = function nomElement(element, props, staticProps) {
         return render(typeof element !== 'string' ? element : document.createElement(element), props, staticProps);
-    } : noOp;
+    };
 
-    nom.mount = isSupportedBrowser ? function nomMount(nodes) {
+    nom.mount = function nomMount(nodes) {
         var fragment = document.createDocumentFragment(), mounts = [], node, nodeIndex = 0;
 
         fragment.unmount = function() {
@@ -117,7 +120,7 @@
         while (nodes.length > nodeIndex) {
             node = nodes[nodeIndex++];
 
-            if (node instanceof Node) {
+            if (hasNode ? node instanceof Node : node.nodeType > 0) {
                 mounts.push(node);
                 fragment.appendChild(node);
             } else if (typeof node === 'string') {
@@ -143,7 +146,7 @@
         requestAnimationFrame(render);
 
         return fragment;
-    } : noOp;
+    };
 
     // support CommonJS
     if (typeof exports === 'object')
@@ -155,4 +158,4 @@
     else
         this.nom = nom;
 
-})('Node' in this && 'document' in this && 'requestAnimationFrame' in this);
+})('document' in this, 'Node' in this, 'requestAnimationFrame' in this);

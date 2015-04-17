@@ -85,39 +85,7 @@ label {
     cursor: pointer;
 }
         </style>
-        <script>
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
-// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
-
-// MIT license
-
-(function() {
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
-                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
-
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
-        };
-
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-}());
-        </script>
+        <script src="../requestAnimationFrame-polyfill.js"></script>
         <script src="../nom.js"></script>
     </head>
     <body>
@@ -126,6 +94,15 @@ label {
         </aside>
         <hr />
         <script>
+// IE8 and below stuff
+function crossEvent(e) {
+    e = e || window.event
+    e.which = e.which || e.charCode || e.keyCode
+    e.target = e.target || e.srcElement
+    if (!e.preventDefault) e.preventDefault = function() { e.defaultPrevented = !(e.returnValue = false) }
+    return e
+}
+
 function todo(state) {
     var formSubmitButton, formTodoInput
 
@@ -139,19 +116,19 @@ function todo(state) {
     }
 
     function add(event) {
-        event.preventDefault()
+        crossEvent(event).preventDefault()
         if (!state.text) return
         state.items.push({ title: state.text })
-        state.text = this.todoInput.value = ''
-        this.todoInput.focus()
+        state.text = formTodoInput.value = ''
+        formTodoInput.focus()
     }
 
     function edit(event) {
-        state.text = event.target.value
+        state.text = crossEvent(event).target.value
     }
 
     function toggle(event) {
-        this.done = event.target.checked
+        this.done = crossEvent(event).target.checked
     }
 
     function nomListItem(item) {
@@ -175,13 +152,7 @@ function todo(state) {
         }, true)
     }
 
-    formTodoInput = nom.el('input', {
-        name: 'todoInput',
-        onchange: edit,
-        oninput: edit,
-        onkeyup: edit,
-        onpaste: edit
-    }, true)
+    formTodoInput = nom.el('input', { onchange: edit, oninput: edit, onkeyup: edit, onpaste: edit }, true)
 
     formSubmitButton = nom.el('button', function() {
         return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
