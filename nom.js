@@ -1,7 +1,7 @@
-/* Nom version 0.0.5, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.6, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(isBrowser, hasNode, hasRAF) {
     function returnNull() { return null; }
-    var nom = { el: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.5' };
+    var nom = { el: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.6' };
     if (!isBrowser || !hasRAF) return nom;
 
     var htmlToDOM = document.createElement('div');
@@ -90,7 +90,7 @@
             } else if (Object.prototype.toString.call(obj[prop]) === '[object Function]');
             else if (typeof value === 'object') {
                 for (item in value)
-                    if (value.hasOwnProperty(item))
+                    if (value.hasOwnProperty(item) && obj[prop][item] !== value[item])
                         obj[prop][item] = value[item];
             }
             else if (obj[prop] !== value)
