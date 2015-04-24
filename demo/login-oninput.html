@@ -1,0 +1,239 @@
+<!DOCTYPE html><!--[if IE]><![endif]-->
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Nom login form</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-shim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-sham.min.js"></script>
+        <![endif]-->
+        <style>
+html {
+    font-family: sans-serif;
+}
+
+small {
+    background: #222;
+    border-radius: 0.25em;
+    color: #ddd;
+    margin: 1em;
+    padding: 0.5em;
+}
+
+form {
+    margin: 2em;
+    max-width: 30em;
+}
+
+fieldset {
+    border: 0;
+}
+
+legend {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+label:first-child {
+    cursor: pointer;
+    display: inline-block;
+    width: 12em;
+}
+
+label:first-child + input {
+    width: 16em;
+}
+
+label:first-child + input + .length {
+    display: block;
+    margin: 0.25rem 0 0.25rem 12rem;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+    
+label:first-child + input + .length--0 {
+    opacity: 0.1;
+}
+    
+label:first-child + input:focus + .length {
+    opacity: 1;
+}
+
+label:first-child + input:focus + .length--0 {
+    opacity: 0.25;
+}
+
+label:first-child:last-child {
+    display: block;
+    margin-left: 12em;
+    width: auto;
+}
+
+label:first-child:last-child input {
+    cursor: inherit;
+    margin-bottom: 0.25em;
+    vertical-align: bottom;
+}
+    
+label:first-child:last-child:first-line {
+    font-size: 0.875em;
+}
+
+footer {
+    background: #DDD;
+    border-radius: 0.5em;
+    box-shadow: inset 0 0 2em -1em #222;
+    padding: 1em;
+    text-align: right;
+}
+        </style>
+        <script src="../requestAnimationFrame-polyfill.js"></script>
+        <script src="../nom.js"></script>
+    </head>
+    <body>
+        <h1>Demo for <code>oninput</code> event (IE8+)</h1>
+        <p>Nom version 0.0.7 adds almost full support for <code>oninput</code> event in IE9 (fixing value deletion issue) and almost as good support for IE8 and below. The event happens when it should, but event object is not guaranteed to exist. Support for <code>addEventListener</code> or <code>attachEvent</code> hasn't been added, DOM Level 1 event support only.</p>
+        <hr />
+        <script>
+function callIfFn(fn) {
+    if (Object.prototype.toString.call(fn) === '[object Function]')
+        return fn.apply(this, Array.prototype.slice.call(arguments, 1))
+}
+
+function selectionToProps(el, props) {
+    if ('selectionStart' in el) {
+        props.selectionStart = ~~el.selectionStart
+        props.selectionEnd = ~~el.selectionEnd
+        props.selectionDirection = el.selectionDirection
+    }
+    return props
+}
+
+function loginForm(props) {
+    this.uid = (~~this.uid) + 1
+
+    var PASSWORD_LENGTH = 48,
+        USERNAME_LENGTH = 48;
+    
+    var id = 'login-' + this.uid,
+        passwordId = 'login-password-' + this.uid
+    
+    var state = {
+        username: '',
+        usernameSelection: [],
+        password: '',
+        showPassword: false
+    }
+    
+    function handleFormSubmit(event) {
+        event.preventDefault()
+        if (state.username.length === 0) return;
+        callIfFn(props.submitCallback, {
+            username: state.username,
+            password: state.password
+        })
+    }
+    
+    function setPassword(event) {
+        state.password = password.value
+    }
+    
+    function setShowPassword(event) {
+        state.showPassword = showPassword.checked
+    }
+    
+    function setUsername(event) {
+        state.username = username.value.replace(/ /g, '_')
+    }
+    
+    var password = nom.el('input', function() {
+        return {
+            id: passwordId,
+            type: state.showPassword ? 'text' : 'password',
+            maxLength: PASSWORD_LENGTH,
+            value: state.password,
+            oninput: setPassword,
+            onkeypress: setPassword,
+            onpaste: setPassword
+        }
+    })
+    
+    var showPassword = nom.el('input', function() {
+        return {
+            type: 'checkbox',
+            checked: state.showPassword,
+            onclick: setShowPassword
+        }
+    })
+    
+    var username = nom.el('input', function() {
+        var newProps = { value: state.username }
+        
+        // optimize by setting these only once
+        if (!this.id) {
+            newProps.id = id
+            newProps.type = 'text'
+            newProps.maxLength = USERNAME_LENGTH
+            newProps.placeholder = 'Spaces not allowed'
+            newProps.oninput = setUsername
+        }
+        
+        // remember caret position/selection (if supported by browser)
+        if (this.value !== state.username)
+            newProps = selectionToProps(this, newProps)
+        
+        return newProps
+    })
+    
+    var form = nom.el('form', { children: [
+        nom.el('fieldset', {
+            children: [
+                nom.el('legend', {children: 'Login'}, true),
+                nom.el('p', { children: [
+                    nom.el('label', { htmlFor: id, children: 'Username:' }, true),
+                    username,
+                    nom.el('small', function() {
+                        return {
+                            children: (USERNAME_LENGTH - state.username.length) + ' characters remain',
+                            className: 'length length--' + state.username.length
+                        }
+                    })
+                ]}, true),
+                nom.el('p', { children: [
+                    nom.el('label', { htmlFor: passwordId, children: 'Password:' }, true),
+                    password,
+                    nom.el('small', function() {
+                        return {
+                            children: (PASSWORD_LENGTH - state.password.length) + ' characters remain',
+                            className: 'length length--' + state.password.length
+                        }
+                    })
+                ]}, true),
+                nom.el('p', { children: [
+                    nom.el('label', { children: [
+                        showPassword,
+                        ' Show password?'
+                    ]}, true)
+                ]}, true)
+            ]
+        }, true),
+        nom.el('footer', {
+            children: nom.el('input', {
+                type: 'submit',
+                value: 'Submit'
+            }, true)
+        }, true)
+    ], onsubmit: handleFormSubmit }, true)
+    
+    return form
+}
+
+document.body.appendChild(nom.mount(loginForm({
+    submitCallback: function(data) {
+        alert('Hello ' + data.username + '!')
+    }
+})))
+        </script>
+    </body>
+</html>

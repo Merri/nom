@@ -1,10 +1,26 @@
-/* Nom version 0.0.6, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.7, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(isBrowser, hasNode, hasRAF) {
     function returnNull() { return null; }
-    var nom = { el: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.6' };
+    var nom = { el: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.7' };
     if (!isBrowser || !hasRAF) return nom;
 
-    var htmlToDOM = document.createElement('div');
+    var htmlToDOM = document.createElement('div'),
+        ieActive = {},
+        ltIE10 = document.all && !window.atob;
+
+    function ieoninput(node) {
+        if (!node || !node.render || !('value' in node) || !('oninput' in node)) return;
+        if (ieActive.node !== node) {
+            ieActive.node = node;
+            ieActive.value = node.value;
+        } else if(ieActive.value !== node.value) {
+            ieActive.value = node.value;
+            node.oninput();
+        }
+    }
+
+    if ('attachEvent' in document && ltIE10)
+        document.attachEvent('onselectionchange', function() { ieoninput(document.activeElement); });
 
     function render(obj, props, staticProps) {
         var item, originalProps = props, prop, value,
@@ -39,7 +55,12 @@
 
             value = props[prop];
 
-            if (prop === 'children' && obj.childNodes) {
+            if (ltIE10 && prop === 'oninput' && !('oninput' in obj)) {
+                // support for Internet Explorer 8 and below
+                obj.onpropertychange = function() {
+                    if (window.event.propertyName === 'value') ieoninput(obj);
+                }
+            } if (prop === 'children' && obj.childNodes) {
                 node = true;
                 nodeIndex = 0;
                 nodes = Array.isArray(value) ? Array.prototype.concat.apply([], value) : [value];
