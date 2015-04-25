@@ -1,142 +1,264 @@
-# Nom
+# NomJS
 
-Nom (or nom.js or NomJS) is a new DOM library. Unlike the inspiration ([React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/)) it only focuses to the DOM. Nom makes no effort to support neat HTML-like input. It doesn't provide a virtual DOM or components either. However Nom gives you the minimum you need to build DOM tree easily in just JavaScript.
+1. Nom creates DOM elements.
+2. Nom helps you keep your data synchronized with DOM elements.
+3. Nom makes it easy to create DOM trees.
 
-Nom's major weakness is that it relies on mutable objects. Unlike React or Riot you don't have a single render function and each element instead "updates itself". Update flow does happen from parent to children.
+Nom (or nom.js or NomJS) is a new DOM library. It has been inspired by both ([React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/)), but instead going the framework route Nom only does DOM, and does it only in browser. Nom gives you no help to making isomorphic sites. Nom isn't trendy.
 
 ## Nom is...
-1. Close to the standards: it spits out DOM element nodes and you directly modify DOM elements.
-2. Minimal in it's approach: at the moment of writing Nom provides only two methods (`nom.el()` and `nom.mount()`).
-3. Performant. Riot focuses to minimalism, Nom is minimalist as well, but with more focus to performance.
+
+1. Close to the standards: Nom only outputs DOM nodes.
+2. Minimal like Riot, but even smaller focus.
+3. Performant. Nom's source prefers inline pattern repetition over helper functions.
 4. Compatible. You can use other tools to screw the DOM and Nom will adapt.
-5. Unfinished: there are still many experiments and figuring outs to do. Things like "does this make sense at all".
+5. Absolutely brilliant. Your mileage may vary depending on your current mood.
 
-## `nom.el()`
+## Documentation
 
-When you want rainbows `nom.el()` poops out a new DOM element.
+Nom comes with three methods: `el`, `els` and `mount`.
+
+1. `el` returns a single DOM element.
+2. `els` returns a document fragment possibly containing multiple DOM elements.
+3. `mount` returns a document fragment which has been assigned to automatic updates.
+
+### Creating an element
 
 ```js
-var mainHeader = nom.el('h1', { textContent: 'I am a header' });
-
-// outputting the following component will generate a constantly updating element
-var counter = 0,
-    counterDisplay = nom.el('p', function() {
-        return { textContent: "I've been rendered " + (++counter) + " times" };
-    });
+var div = nom.el('div');
+// = <div></div>
 ```
 
-The first argument is a string telling which DOM element you want. Simple enough.
-
-The second argument is more interesting: it can be an object or a function that returns an object. The object contains **DOM element properties**. So things like `className`, `style`, `textContent`, `innerHTML`, `onclick` etc. can be used. Any property that works with a DOM node is usable. There is also a special case of `children` which allows you to pass child elements. Note that using `textContent` and `innerHTML` will override all contents, so you shouldn't mix use of `children` with those properties as that won't work.
-
-Passing an object is more performant to use, but it also means you have to create a reference of that object into a variable to be able to modify it.
-
-Function allows for a bit more compact code as you don't need to create a variable to be able to change properties or child elements of an element.
-
-`children` allows a single element or an array of elements. Elements don't need to be created using Nom. Strings are also accepted and will result in text nodes.
-
-## `nom.mount()`
-
-You can pass a single element, many elements as arguments, an array of elements or even multiple arrays. Elements don't need to be created using Nom. A string is understood as HTML and will result in non-Nom DOM nodes (I like reading that!).
-
-Internally Nom uses requestAnimationFrame to repaint the DOM. However this feature is only enabled if element is passed to DOM via `nom.mount()`. An unmounted Nom element in DOM tree can be manually refreshed by calling `.render()` on it.
-
-`nom.mount()` returns a DocumentFragment that can be easily inserted to a page by using native DOM methods like `document.body.appendChild()`.
-
-You can call `.unmount()` to remove elements from DOM and restore them as children of the DocumentFragment.
-
-In short Nom doesn't force it's way: if you want to manually control refresh of elements with some convenience provided by Nom, you can do that. But if you want total override by constant refresh then Nom can give that too. Also, Nom doesn't care about elements it hasn't created so you can freely mix them where ever you want without fear of Nom breaking your stuff.
-
-## Creating components
-
-You can use Nom's features whichever way you see fit, but here is one way that is very similar to how Riot does things. Below you can see a recoding of [Riot todo example](http://muut.github.io/riotjs/demo/) with Nom instead.
+Boring!
 
 ```js
-function todo(state) {
-    var formSubmitButton, formTodoInput;
+var awesome = nom.el('div.awesome');
+// = <div class="awesome"></div>
+```
 
-    // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
-    state = {
-        items: (state.items || []).map(function(item) {
-            return { title: item.title || '', done: !!item.done }
-        }),
-        text: state.text || '',
-        title: state.title || ''
-    };
+Awesome!
 
-    function add(event) {
-        event.preventDefault();
-        if (!state.text) return;
-        state.items.push({ title: state.text });
-        state.text = this.todoInput.value = '';
-        this.todoInput.focus();
+### Creating elements with content
+
+`el`'s second parameter is intended for properties. However you can also give it strings (to generate text nodes) and arrays (containing stuff to generate as nodes). You're not creating complex stuff all the time anyway, sometimes you just want simple elements.
+
+```js
+var div = nom.el('div', 'Text');
+// = <div>Text</div>
+```
+
+```js
+var div = nom.el('div', [
+    nom.el('p', 'Text')
+]);
+// = <div><p>Text</p></div>
+```
+
+### Manipulating properties
+
+Sometimes you need things to be a little more complex. Besides having child elements you want to have some properties set.
+
+```js
+var div = nom.el('div', {
+    className: 'awesome',
+    children: 'Text',
+    style: {
+        backgroundColor: 'black',
+        color: 'white'
     }
+});
+// = <div class="awesome" style="background-color: black; color: white;">Text</div>
 
-    function edit(event) {
-        state.text = event.target.value;
-    }
+### Adding elements to document
 
-    function toggle(event) {
-        this.done = event.target.checked;
-    }
+Simply use the regular methods you should already be familiar with: `appendChild`, `insertBefore`, `replaceChild`.
 
-    function nomListItem(item) {
-        if (item.nom) return item.nom;
+```js
+document.body.appendChild(
+    nom.el('div', 'I have been added to the DOM.')
+);
+// <!doctype><html><head>&hellip;</head><body><div>I have been added to the DOM.</div></body></html>
+```
 
-        var itemCheckbox = nom.el('input', function() {
-            return {
-                type: 'checkbox',
-                checked: item.done,
-                onclick: toggle.bind(item)
-            }
-        });
+### Changing properties
 
-        return item.nom = nom.el('li', {
-            children: nom.el('label', function() {
-                return {
-                    className: item.done ? 'completed' : '',
-                    children: [ itemCheckbox, ' ' + item.title ]
-                }
-            })
-        })
-    }
+Elements created with Nom must be passed via `mount` before the magic happens. Each element can have it's own small routine for updates.
 
-    formTodoInput = nom.el('input', {
-        name: 'todoInput',
-        onchange: edit,
-        oninput: edit,
-        onkeyup: edit,
-        onpaste: edit
-    });
+```js
+var counter = 0;
 
-    formSubmitButton = nom.el('button', function() {
-        return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
-    });
+document.body.appendChild(nom.mount(
+    nom.el('div', function() {
+        return {
+            children: 'Render has been called ' + (++counter) + ' times and that is as many times I have been updated.'
+        }
+    })
+));
+```
 
-    return nom.mount(
-        nom.el('h3', { textContent: state.title }),
-        nom.el('ul', function() {
-            return { children: state.items.map(nomListItem) }
-        }),
-        nom.el('form', { onsubmit: add, children: [ formTodoInput, formSubmitButton ] })
-    );
+The above is quite different from how React and Riot do things. In Nom you always focus to single element's render. Add a child? Remove a child? Change `children`. They can then take care of themselves. The component will come.
+
+### Object notation
+
+Now we can introduce `els`. It can eat elements created by `el`, and it can take arrays of them, and it can take HTML strings. But most importantly `els` can accept objects with a very compact syntax and create element trees.
+
+```js
+var tree = nom.els({
+    'div.tree': [
+        '<h1>Can use HTML here to create a header</h1>',
+        {p: 'Or you can create a paragraph in a much more efficient way!'}
+    ]
+})
+// no need to mount: we have nothing that would re-render itself anyway
+document.body.appendChild(tree);
+
+//= <div class="tree">
+//      <h1>Can use HTML here to create a header</h1>
+//      <p>Or you can create a paragraph in a much more efficient way!</p>
+//  </div>
+```
+
+### A more complete example
+
+Nom is still quite fresh and evolving so writing a comprehensive documentation isn't a high priority just yet. So here is a more complete example of a login form and one example how to structure code.
+
+```js
+function callIfFn(fn) {
+    if (Object.prototype.toString.call(fn) === '[object Function]')
+        return fn.apply(this, Array.prototype.slice.call(arguments, 1))
 }
 
-document.body.appendChild(
-    todo({
-        title: 'I want to behave!',
-        items: [
-            { title: 'Avoid excessive caffeine', done: true },
-            { title: 'Be less provocative' },
-            { title: 'Be nice to people' }
-        ]
+function selectionToProps(el, props) {
+    if ('selectionStart' in el) {
+        props.selectionStart = ~~el.selectionStart
+        props.selectionEnd = ~~el.selectionEnd
+        props.selectionDirection = el.selectionDirection
+    }
+    return props
+}
+
+function loginForm(props) {
+    this.uid = (~~this.uid) + 1
+
+    var PASSWORD_LENGTH = 48,
+        USERNAME_LENGTH = 48;
+    
+    var id = 'login-' + this.uid,
+        passwordId = 'login-password-' + this.uid
+    
+    var state = {
+        username: '',
+        usernameSelection: [],
+        password: '',
+        showPassword: false
+    }
+    
+    function handleFormSubmit(event) {
+        event.preventDefault()
+        if (state.username.length === 0) return;
+        callIfFn(props.submitCallback, {
+            username: state.username,
+            password: state.password
+        })
+    }
+    
+    function setPassword(event) {
+        state.password = passwordField.value
+    }
+    
+    function setShowPassword(event) {
+        state.showPassword = showPasswordCheckbox.checked
+    }
+    
+    function setUsername(event) {
+        state.username = usernameField.value.replace(/ /g, '_')
+    }
+    
+    var passwordField = nom.el('input.form__text form__text--password', function() {
+        return {
+            id: passwordId,
+            type: state.showPassword ? 'text' : 'password',
+            maxLength: PASSWORD_LENGTH,
+            value: state.password,
+            oninput: setPassword
+        }
     })
-);
+    
+    var showPasswordCheckbox = nom.el('input.form__checkbox form__checkbox--show-username', function() {
+        return {
+            type: 'checkbox',
+            checked: state.showPassword,
+            onclick: setShowPassword
+        }
+    })
+    
+    var usernameField = nom.el('input.form__text form__text--username', function() {
+        var newProps = { value: state.username }
+        
+        // optimize by setting these only once
+        if (!this.id) {
+            newProps.id = id
+            newProps.type = 'text'
+            newProps.maxLength = USERNAME_LENGTH
+            newProps.placeholder = 'Spaces not allowed'
+            newProps.oninput = setUsername
+        }
+        
+        // remember caret position/selection (if supported by browser)
+        if (this.value !== state.username)
+            newProps = selectionToProps(this, newProps)
+        
+        return newProps
+    })
+    
+    var form = nom.els({
+        'form.form': {
+            onsubmit: handleFormSubmit,
+            children: [
+                {'fieldset.form__fields': [
+                    {'legend.form__fields-title': 'Login'},
+                    {'p.form__field form__field--username': [
+                        {'label.form__field-label': { htmlFor: id, children: 'Username:' }},
+                        usernameField,
+                        {small: function() {
+                            return {
+                                children: (USERNAME_LENGTH - state.username.length) + ' characters remain',
+                                className: 'length length--' + state.username.length
+                            }
+                        }}
+                    ]},
+                    {'p.form__field form__field--password': [
+                        {label: { htmlFor: passwordId, children: 'Password:' }},
+                        passwordField,
+                        {small: function() {
+                            return {
+                                children: (PASSWORD_LENGTH - state.password.length) + ' characters remain',
+                                className: 'length length--' + state.password.length
+                            }
+                        }}
+                    ]},
+                    {'p.form__field form__field--show-password': [
+                        {label: [showPasswordCheckbox, ' Show password?']}
+                    ]}
+                ]},
+                {'footer.form__footer': [
+                    {'input.form__button': { type: 'submit', value: 'Submit' }}
+                ]}
+            ]
+        }
+    })
+
+    return form
+}
+
+document.body.appendChild(nom.mount(
+    loginForm({
+        submitCallback: function(data) {
+            alert('Hello ' + data.username + '!')
+        }
+    })
+))
 ```
-
-[Working sample at CodePen](http://codepen.io/Merri/full/YPbwBB/).
-
-Length of this example can be greatly reduced by using ES2015 as it allows lambda syntax for functions. Of course that means you need to use a preprocessor as browser support for the new EcmaScript standard isn't complete yet.
 
 # Requirements
 

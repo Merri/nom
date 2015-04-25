@@ -136,30 +136,28 @@ function loginForm(props) {
     }
     
     function setPassword(event) {
-        state.password = password.value
+        state.password = passwordField.value
     }
     
     function setShowPassword(event) {
-        state.showPassword = showPassword.checked
+        state.showPassword = showPasswordCheckbox.checked
     }
     
     function setUsername(event) {
-        state.username = username.value.replace(/ /g, '_')
+        state.username = usernameField.value.replace(/ /g, '_')
     }
     
-    var password = nom.el('input', function() {
+    var passwordField = nom.el('input.form__text form__text--password', function() {
         return {
             id: passwordId,
             type: state.showPassword ? 'text' : 'password',
             maxLength: PASSWORD_LENGTH,
             value: state.password,
-            oninput: setPassword,
-            onkeypress: setPassword,
-            onpaste: setPassword
+            oninput: setPassword
         }
     })
     
-    var showPassword = nom.el('input', function() {
+    var showPasswordCheckbox = nom.el('input.form__checkbox form__checkbox--show-username', function() {
         return {
             type: 'checkbox',
             checked: state.showPassword,
@@ -167,7 +165,7 @@ function loginForm(props) {
         }
     })
     
-    var username = nom.el('input', function() {
+    var usernameField = nom.el('input.form__text form__text--username', function() {
         var newProps = { value: state.username }
         
         // optimize by setting these only once
@@ -186,13 +184,53 @@ function loginForm(props) {
         return newProps
     })
     
+    // new syntax introduced in 0.0.8
+    var form = nom.els({
+        'form.form': {
+            onsubmit: handleFormSubmit,
+            children: [
+                {'fieldset.form__fields': [
+                    {'legend.form__fields-title': 'Login'},
+                    {'p.form__field form__field--username': [
+                        {'label.form__field-label': { htmlFor: id, children: 'Username:' }},
+                        usernameField,
+                        {small: function() {
+                            return {
+                                children: (USERNAME_LENGTH - state.username.length) + ' characters remain',
+                                className: 'length length--' + state.username.length
+                            }
+                        }}
+                    ]},
+                    {'p.form__field form__field--password': [
+                        {label: { htmlFor: passwordId, children: 'Password:' }},
+                        passwordField,
+                        {small: function() {
+                            return {
+                                children: (PASSWORD_LENGTH - state.password.length) + ' characters remain',
+                                className: 'length length--' + state.password.length
+                            }
+                        }}
+                    ]},
+                    {'p.form__field form__field--show-password': [
+                        {label: [showPasswordCheckbox, ' Show password?']}
+                    ]}
+                ]},
+                {'footer.form__footer': [
+                    {'input.form__button': { type: 'submit', value: 'Submit' }}
+                ]}
+            ]
+        }
+    })
+
+/*
+    // version 0.0.7 syntax sample
     var form = nom.el('form', { children: [
         nom.el('fieldset', {
             children: [
                 nom.el('legend', {children: 'Login'}, true),
                 nom.el('p', { children: [
                     nom.el('label', { htmlFor: id, children: 'Username:' }, true),
-                    username,
+                    usernameField,
                     nom.el('small', function() {
                         return {
                             children: (USERNAME_LENGTH - state.username.length) + ' characters remain',
@@ -202,7 +240,7 @@ function loginForm(props) {
                 ]}, true),
                 nom.el('p', { children: [
                     nom.el('label', { htmlFor: passwordId, children: 'Password:' }, true),
-                    password,
+                    passwordField,
                     nom.el('small', function() {
                         return {
                             children: (PASSWORD_LENGTH - state.password.length) + ' characters remain',
@@ -212,7 +250,7 @@ function loginForm(props) {
                 ]}, true),
                 nom.el('p', { children: [
                     nom.el('label', { children: [
-                        showPassword,
+                        showPasswordCheckbox,
                         ' Show password?'
                     ]}, true)
                 ]}, true)
@@ -225,6 +263,7 @@ function loginForm(props) {
             }, true)
         }, true)
     ], onsubmit: handleFormSubmit }, true)
+*/
     
     return form
 }
