@@ -56,7 +56,7 @@ var div = nom.el('div', [
 
 ### Manipulating properties
 
-Sometimes you need things to be a little more complex. Besides having child elements you want to have some properties set.
+At other times you need things to be a little more complex. Besides having child elements you want to have some properties set.
 
 ```js
 var div = nom.el('div', {
@@ -68,6 +68,7 @@ var div = nom.el('div', {
     }
 });
 // = <div class="awesome" style="background-color: black; color: white;">Text</div>
+```
 
 ### Adding elements to document
 
