@@ -9,7 +9,7 @@ Nom (or nom.js or NomJS) is a new DOM library. It has been inspired by both ([Re
 ## Nom is...
 
 1. Close to the standards: Nom only outputs DOM nodes.
-2. Minimal like Riot, but even smaller focus.
+2. Minimal like Riot, but with even smaller focus.
 3. Performant. Nom's source prefers inline pattern repetition over helper functions.
 4. Compatible. You can use other tools to screw the DOM and Nom will adapt.
 5. Absolutely brilliant. Your mileage may vary depending on your current mood.
@@ -78,7 +78,11 @@ Simply use the regular methods you should already be familiar with: `appendChild
 document.body.appendChild(
     nom.el('div', 'I have been added to the DOM.')
 );
-// <!doctype><html><head>&hellip;</head><body><div>I have been added to the DOM.</div></body></html>
+//  <!doctype>
+//  <html>
+//      <head>...</head>
+//      <body><div>I have been added to the DOM.</div></body>
+//  </html>
 ```
 
 ### Changing properties
@@ -97,7 +101,9 @@ document.body.appendChild(nom.mount(
 ));
 ```
 
-The above is quite different from how React and Riot do things. In Nom you always focus to single element's render. Add a child? Remove a child? Change `children`. They can then take care of themselves. The component will come.
+Remember that in real life code you should never mutate your data like the example above does with the `counter` variable. The code in these property changing functions should only reflect changes in data to the properties. Not create those changes.
+
+Nom differs to React here, because React does everything it can to avoid a render call (and thus `setState` requirement for changing data). Nom will call each property function on every render and check if a property has changed. This means Nom code will only force state of a few selected properties of your choice, not take over the entire DOM like React does.
 
 ### Object notation
 
