@@ -1,9 +1,9 @@
-/* Nom version 0.0.8, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.9, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(isBrowser, hasNode, hasRAF) {
     'use strict';
     // return at least something when outside browser environment or if no requestAnimationFrame available...
     function returnNull() { return null; }
-    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.8' };
+    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.9' };
     // Nom depends on requestAnimationFrame
     if (!isBrowser || !hasRAF) return nom;
     // htmlToDOM is HTML generator helper element
@@ -56,6 +56,9 @@
         // should be an object now
         if (typeof props !== 'object')
             return obj;
+        // array is expected to contain child nodes
+        if (Array.isArray(props))
+            props = {children: props};
         // apply each property
         for (prop in props) {
             if (!props.hasOwnProperty(prop)) continue;
