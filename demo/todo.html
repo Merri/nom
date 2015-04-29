@@ -103,9 +103,8 @@ function crossEvent(e) {
     return e
 }
 
+// a simple component to wrap all todo stuff; all state is handled inside component once created
 function todo(state) {
-    var formSubmitButton, formTodoInput
-
     // create a new object and sanitize input to avoid corrupting external object (mutability can be evil)
     state = {
         items: !Array.isArray(state.items) ? [] : state.items.map(function(item) {
@@ -132,7 +131,8 @@ function todo(state) {
     }
 
     function nomListItem(item) {
-        if (item.nom) return item.nom
+        // do we already have nomified element for this array item?
+        if (item.nomEl) return item.nomEl
 
         var itemCheckbox = nom.el('input', function() {
             return {
@@ -142,32 +142,33 @@ function todo(state) {
             }
         })
 
-        return item.nom = nom.el('li', {
-            children: nom.el('label', function() {
+        // store a reference directly to the array item
+        return item.nomEl = nom.el('li', [
+            {label: function() {
                 return {
                     className: item.done ? 'completed' : '',
                     children: [ itemCheckbox, ' ' + item.title ]
                 }
-            })
-        }, true)
+            }}
+        ])
     }
 
-    formTodoInput = nom.el('input', { onchange: edit, oninput: edit, onkeyup: edit, onpaste: edit }, true)
+    // this element reference is needed in add function (could also use `this`)
+    var formTodoInput = nom.el('input', { oninput: edit }, true)
 
-    formSubmitButton = nom.el('button', function() {
-        return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
-    })
-
-    return nom.mount(
-        nom.el('h3', { children: state.title }, true),
-        nom.el('ul', function() {
-            return { children: state.items.map(nomListItem) }
-        }),
-        nom.el('form', { onsubmit: add, children: [ formTodoInput, formSubmitButton ] })
+    return nom.els(
+        {h3: state.title},
+        {ul: function() { return state.items.map(nomListItem) }},
+        {form: { onsubmit: add, children: [
+            formTodoInput,
+            {button: function() {
+                return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
+            }}
+        ] }}
     )
 }
 
-document.body.appendChild(
+document.body.appendChild(nom.mount(
     todo({
         title: 'I want to behave!',
         items: [
@@ -176,7 +177,7 @@ document.body.appendChild(
             { title: 'Be nice to people' }
         ]
     })
-)
+))
         </script>
     </body>
 </html>
