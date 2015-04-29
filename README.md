@@ -125,6 +125,62 @@ document.body.appendChild(tree);
 //  </div>
 ```
 
+### Dealing with `children` and arrays
+
+Using data from arrays outside the component scope can be a little bit less obvious to use with Nom. The main thing to avoid is creation of a new Nom element each time the render occurs as this would be a huge contributor to performance and usability issues.
+
+In general there are two kinds of data within components: component's local state and external state (props in React's language). Dealing with local state (and local arrays) is easier. You have full control over the data and thus you can decide what to do with it. With local state and non-numeric arrays it is possible to simply drop the Nom-initialized element as a property into an array item and then return the element instead of a new Nom element if the array item has the element initialized. This example can be found from the todo demo. On each render `map` is called on array items:
+
+```js
+    // this element reference is needed in add function (could also use `this`)
+    var formTodoInput = nom.el('input', { oninput: edit }, true)
+
+    return nom.els(
+        {h3: state.title},
+        // this is where li elements are created as children of ul
+        {ul: function() { return state.items.map(nomListItem) }},
+        {form: { onsubmit: add, children: [
+            formTodoInput,
+            {button: function() {
+                return { disabled: !state.text, children: 'Add #' + (1 + state.items.length) }
+            }}
+        ] }}
+    )
+```
+
+Creating new elements on each render is a horrible idea, so what does `nomListItem` look like?
+
+```js
+    function nomListItem(item) {
+        // do we already have nomified element for this array item?
+        if (item.nomEl) return item.nomEl
+
+        var itemCheckbox = nom.el('input', function() {
+            return {
+                type: 'checkbox',
+                checked: item.done,
+                onclick: toggle.bind(item)
+            }
+        })
+
+        // store a reference directly to the array item
+        return item.nomEl = nom.el('li', [
+            {label: function() {
+                return {
+                    className: item.done ? 'completed' : '',
+                    children: [ itemCheckbox, ' ' + item.title ]
+                }
+            }}
+        ])
+    }
+```
+
+Essentially this method only works because of **mutability**. `item` is always a reference to an object that may have it's values mutated. These changes are then applied to properties in the label's function.
+
+But what if data comes from the outside? It is not a good idea to mutate data which is not our own. The above does not answer that question.
+
+**TODO** More documentation!
+
 ### A more complete example
 
 Nom is still quite fresh and evolving so writing a comprehensive documentation isn't a high priority just yet. So here is a more complete example of a login form and one example how to structure code.
@@ -269,9 +325,33 @@ document.body.appendChild(nom.mount(
 
 # Requirements
 
-These are more like recommendations than hard requirements. You'll simply get broader browser support. With no help Nom is IE10+ and Android 4.4+.
+Nom doesn't really need anything if you're using a modern browser. However to improve browser support it is a good idea to consider the following:
 
-1. es5shim
-2. requestAnimationFrame polyfill
+1. [es5-shim](https://github.com/es-shims/es5-shim) or [core-js](https://github.com/zloirock/core-js)
+2. [requestAnimationFrame polyfill](https://gist.github.com/paulirish/1579671) (**note!** the one provided here on Nom's repo requires es5-shim)
+
+Nom's code is written so that it should run flawlessly on itself even on engines as old as IE5 as long as shim for ECMAScript 5 and polyfill for requestAnimationFrame are provided. Nom doesn't care about specific special issues that these old browser engines have. For example, you can't change `<input type="password" />` to `<input type="text" />` on the fly in IE8 and earlier.
+
+## With no external help applied Nom works on...
+
+- Firefox 23+
+- Chrome 24+
+- Internet Explorer 10+
+- Safari 6.1+
+- iOS Safari 7+
+- Android 4.4+
+- Opera 15+
+- Opera Mobile 24+
+- IE Mobile 10+
 
 [Can I Use... requestAnimationFrame](http://caniuse.com/#search=requestanimationframe) shows quite a good approximation of the minimum browser support without any aid.
+
+# TODO
+
+Nom is still young and in need of more polish. These things need to be done:
+
+1. Tests and running them on multiple browsers.
+2. A Real Project using Nom for dealing with the DOM.
+3. Documentation showcasing useful patterns and telling what to avoid.
+
+The rest will be just Nom's natural evolution and evaluation of what features it needs to provide to ease development pain and which things it can ignore and let remain a developer's issue (cross-browser ones).
