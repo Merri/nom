@@ -1,12 +1,12 @@
 <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="225" width="720" />
 
+> Nom (or nom.js or NomJS) is a new DOM library. It has been inspired by both [React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/), but instead going the frameworkish route Nom only does DOM, and does it only in browser. Nom gives you no help to making isomorphic sites, tells you in no way how you should go with your routing (standalone library or custom solution does it better anyway) and doesn't practically force you into using pre-compile tools. Because Nom isn't trendy.
+
 ## 1.5 kB DOM library • browser only • compact syntax
 
 1. Nom creates DOM elements.
 2. Nom helps you keep your data synchronized with DOM elements.
 3. Nom makes it easy to create DOM trees.
-
-> Nom (or nom.js or NomJS) is a new DOM library. It has been inspired by both [React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/), but instead going the frameworkish route Nom only does DOM, and does it only in browser. Nom gives you no help to making isomorphic sites, tells you in no way how you should go with your routing (standalone library or custom solution does it better anyway) and doesn't practically force you into using pre-compile tools. Because Nom isn't trendy.
 
 You can think of Nom as a kitten. Or just a kitten's head. It makes your code look cute. Your app will be the body. And then your code will produce... rainbows. Because that is how cats work on the Internet.
 
