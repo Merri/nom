@@ -154,33 +154,28 @@
     // takes element or creates an element, applies properties to the element ("nomifies it") and returns the element
     nom.el = function nomElement(element, props, staticProps) {
         var className;
-        // sanitate against no props
-        if (props == null) {
-            props = {};
-            if (staticProps == null) staticProps = true;
-        }
-        // see if props are really props, make them children if not so
-        switch (typeof props) {
-            case 'function':
-                break;
-            case 'boolean':
-            case 'number':
-                props = props.toString();
-            // intentional to omit break here
-            case 'string':
-                props = { children: props };
-                if (staticProps == null) staticProps = true;
-                break;
-            case 'object':
-                // do nothing more if it isn't an array
-                if (Array.isArray(props)) {
+        // functions need no processing here
+        if (objectToString.call(props) !== objectFunction) {
+            // sanitate against no props
+            if (props == null)
+                props = {};
+            // default to single assignment of properties
+            if (staticProps == null)
+                staticProps = true;
+            // see if props are really props, make them children if not so
+            switch (typeof props) {
+                case 'object':
+                    // do nothing more if it isn't an array
+                    if (Array.isArray(props))
+                        props = { children: props };
+                    break;
+                case 'boolean':
+                case 'number':
+                    props = props.toString();
+                // intentional to omit break here
+                default:
                     props = { children: props };
-                    if (staticProps == null) staticProps = true;
-                }
-                break;
-            default:
-                props = { children: props };
-                if (staticProps == null) staticProps = true;
+            }
         }
         // see if we need to build an element
         if (typeof element === 'string') {
@@ -218,15 +213,11 @@
             // recursive call for arrays
             } else if (Array.isArray(node)) {
                 fragment.appendChild(nomElements.apply(this, node));
-            // object notation elements are passed to nom.el as static elements (except if a render function is given)
+            // object notation elements
             } else if (typeof node === 'object') {
                 for (nodeTag in node) {
                     if (node.hasOwnProperty(nodeTag))
-                        fragment.appendChild(nom.el(
-                            nodeTag,
-                            node[nodeTag],
-                            objectToString.call(node[nodeTag]) !== objectFunction
-                        ));
+                        fragment.appendChild(nom.el(nodeTag, node[nodeTag]));
                 }
             }
         }
