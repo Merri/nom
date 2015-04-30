@@ -1,4 +1,6 @@
-# NomJS • a 1.5 kB DOM library • browser only • compact syntax
+<img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="225" width="720" />
+
+## 1.5 kB DOM library • browser only • compact syntax
 
 1. Nom creates DOM elements.
 2. Nom helps you keep your data synchronized with DOM elements.
