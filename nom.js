@@ -1,13 +1,19 @@
-/* Nom version 0.0.9, @license MIT, (c) 2015 Vesa Piittinen */
-;(function(isBrowser, hasNode, hasRAF) {
+/* Nom version 0.0.10, @license MIT, (c) 2015 Vesa Piittinen */
+;(function(window, isBrowser, hasNode, hasRAF) {
     'use strict';
     // return at least something when outside browser environment or if no requestAnimationFrame available...
     function returnNull() { return null; }
-    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.9' };
+    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.10' };
     // Nom depends on requestAnimationFrame
     if (!isBrowser || !hasRAF) return nom;
-    // htmlToDOM is HTML generator helper element
-    var htmlToDOM = document.createElement('div'),
+    // optimize minified JS size
+    var Array = window.Array,
+        document = window.document,
+        flatten = Array.prototype.concat,
+        objectFunction = '[object Function]',
+        objectToString = Object.prototype.toString,
+        // htmlToDOM is HTML generator helper element
+        htmlToDOM = document.createElement('div'),
         ieActive = {},
         ltIE10 = 'all' in document && !window.atob;
     // patch IE9 oninput event bug (does not trigger if deleting value) and use the same code to add IE8- support
@@ -41,14 +47,14 @@
                 if (!staticProps) render(obj, originalProps);
                 // call render of all the children
                 while (node) {
-                    if (Object.prototype.toString.call(node.render) === '[object Function]')
+                    if (objectToString.call(node.render) === objectFunction)
                         node.render();
 
                     node = node.nextSibling;
                 }
             };
         // if it is a function then assume it returns properties
-        if (Object.prototype.toString.call(props) === '[object Function]')
+        if (objectToString.call(props) === objectFunction)
             props = props.bind(obj)();
         // if it is a string then assume it is JSON
         else if (typeof props === 'string' && props.charCodeAt(0) === 0x7B) // = '{'
@@ -73,7 +79,7 @@
                 node = true;
                 nodeIndex = 0;
                 // shallow flatten to a one dimensional array, eg. [[a], [b, [c]]] -> [a, b, [c]]
-                nodes = Array.isArray(value) ? Array.prototype.concat.apply([], value) : [value];
+                nodes = Array.isArray(value) ? flatten.apply([], value) : [value];
                 // the following will reorganize nodes and update text nodes in order
                 existingNode = obj.firstChild;
                 while (existingNode) {
@@ -95,7 +101,7 @@
                         // request next node/string
                         node = true;
                     // see if this is a Nom extended node
-                    } else if (Object.prototype.toString.call(existingNode.render) === '[object Function]') {
+                    } else if (objectToString.call(existingNode.render) === objectFunction) {
                         // have we ran out of nodes?
                         if (!node) {
                             // abandon ship!
@@ -130,7 +136,7 @@
                     node = nodes[nodeIndex++];
                 }
             // skip functions
-            } else if (Object.prototype.toString.call(obj[prop]) === '[object Function]');
+            } else if (objectToString.call(obj[prop]) === objectFunction);
             // apply subproperties like style if value is an object
             else if (typeof value === 'object') {
                 for (item in value)
@@ -195,7 +201,7 @@
     nom.els = function nomElements(nodes) {
         var fragment = document.createDocumentFragment(), node, nodeIndex = 0, nodeTag;
         // create a real array out of everything given
-        nodes = Array.prototype.concat.apply([], arguments);
+        nodes = flatten.apply([], arguments);
         // nodes isn't really containing nodes yet, but we make them be ones
         while (nodes.length > nodeIndex) {
             node = nodes[nodeIndex++];
@@ -219,7 +225,7 @@
                         fragment.appendChild(nom.el(
                             nodeTag,
                             node[nodeTag],
-                            Object.prototype.toString.call(node[nodeTag]) !== '[object Function]'
+                            objectToString.call(node[nodeTag]) !== objectFunction
                         ));
                 }
             }
@@ -239,7 +245,7 @@
             // remember all original childNodes of the fragment so we can restore them to fragment on unmount
             nodes.push(node = fragment.childNodes[nodeIndex++]);
             // gather additional reference of Nom rendered element
-            if (Object.prototype.toString.call(node.render) === '[object Function]')
+            if (objectToString.call(node.render) === objectFunction)
                 mounts.push(node);
         }
         // ends rendering and removes all original children from the document and returns the fragment
@@ -262,7 +268,7 @@
                 if (!mount.parentElement)
                     mounts.splice(index, 1);
                 // are we responsible for the render?
-                else if (Object.prototype.toString.call(mount.parentElement.render) !== '[object Function]')
+                else if (objectToString.call(mount.parentElement.render) !== objectFunction)
                     mount.render();
             }
             // keep rendering as long as there is something we can be responsible of
@@ -284,4 +290,4 @@
     else
         window.nom = nom;
 
-})('document' in this, 'Node' in this, 'requestAnimationFrame' in this);
+})(this, 'document' in this, 'Node' in this, 'requestAnimationFrame' in this);
