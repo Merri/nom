@@ -338,7 +338,9 @@ Nom doesn't really need anything if you're using a modern browser. However to im
 1. [es5-shim](https://github.com/es-shims/es5-shim) or [core-js](https://github.com/zloirock/core-js)
 2. [requestAnimationFrame polyfill](https://gist.github.com/paulirish/1579671) (**note!** the one provided here on Nom's repo requires es5-shim)
 
-Nom's code is written so that it should run flawlessly on itself even on engines as old as IE5 as long as shim for ECMAScript 5 and polyfill for requestAnimationFrame are provided. Nom doesn't care about specific special issues that these old browser engines have. For example, you can't change `<input type="password" />` to `<input type="text" />` on the fly in IE8 and earlier.
+Nom's code is written so that it should run flawlessly on itself even on engines as old as IE5 as long as shim for ECMAScript 5 and polyfill for requestAnimationFrame are provided. Nom doesn't care about specific special issues that these old browser engines have. For example, you can't change `<input type="password" />` to `<input type="text" />` on the fly in IE8 and earlier. That is out of scope for Nom.
+
+What **is** within Nom's scope are standard methods. `oninput` is patched by Nom to work cross-browser from IE8ish onwards. It isn't patched entirely (event listeners are not supported), but just enough so that you don't need to hack around with multitude of other events like `onfocus`, `onkeypress` and so on. At the moment of writing (2015-05-01) this is the only notable workaround and IE-specificity within Nom.
 
 ## With no external help applied Nom works on...
 
