@@ -12,12 +12,13 @@ You can think of Nom as a kitten. Or just a kitten's head. It makes your code lo
 
 ## Nom is...
 
-1. Close to the standards: Nom only outputs DOM nodes you already know.
+1. Close to the standards: Nom only outputs DOM nodes.
 2. Minimal like Riot, but with even smaller focus.
 3. Performant. Nom's source prefers inline pattern repetition over helper functions.
 4. Compatible. You can use other tools to screw the DOM and Nom will adapt.
 5. Small like a kitten. Makes even your non-iOS mobile phone *purrrr*.
 6. Easy for anyone to just drop on their site (like jQuery) and it just works.
+7. Ideal for beginners: Nom takes the hard away and doesn't rename things for sake of "convenience".
 
 So Nom is... **absolutely brilliant**! (I'm trying to be convincing here. Play along.)
 
