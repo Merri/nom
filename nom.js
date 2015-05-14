@@ -154,7 +154,7 @@
 
     // takes element or creates an element, applies properties to the element ("nomifies it") and returns the element
     nom.el = function nomElement(element, props, staticProps) {
-        var className;
+        var cssishParts, index = 0;
         // functions need no processing here
         if (objectToString.call(props) !== objectFunction) {
             // sanitate against no props
@@ -180,14 +180,18 @@
         }
         // see if we need to build an element
         if (typeof element === 'string') {
-            // see if we need to build classes
-            if (element.indexOf('.') !== -1) {
-                className = element.split('.');
-                element = document.createElement(className.shift());
-                element.className = className.join(' ');
-            // boldly go where no-one has gone before
-            } else
-                element = document.createElement(element);
+            cssishParts = element.match(/([#.]?[^#.]+)/g);
+            element = document.createElement(cssishParts[0])
+            while (++index < cssishParts.length) {
+                switch(cssishParts[index].charCodeAt(0)) {
+                    case 0x23: // #
+                        element.id = cssishParts[index].slice(1);
+                        break;
+                    case 0x2E: // .
+                        element.className = cssishParts[index].slice(1);
+                        break;
+                }
+            }
         }
         // assign new properties and add Nom's rendering capabilities to the element
         return render(element, props, !!staticProps);
