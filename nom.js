@@ -139,9 +139,10 @@
             } else if (objectToString.call(obj[prop]) === objectFunction);
             // apply subproperties like style if value is an object
             else if (typeof value === 'object') {
-                for (item in value)
-                    if (value.hasOwnProperty(item) && obj[prop][item] !== value[item])
-                        obj[prop][item] = value[item];
+                if (obj[prop] != null)
+                    for (item in value)
+                        if (value.hasOwnProperty(item) && obj[prop][item] !== value[item])
+                            obj[prop][item] = value[item];
             }
             // simply set the property
             else if (obj[prop] !== value)
