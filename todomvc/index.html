@@ -15,7 +15,7 @@
         <script src="node_modules/todomvc-common/base.js"></script>
         <script src="../nom.js"></script>
         <script>
-!function(){
+!function(){'use strict'
     function createTodoItem(todo) {
         return {
             completed: !!todo.completed,
@@ -244,9 +244,9 @@
         }
 
         function updateItems(todos) {
-            //try {
+            try {
                 localStorage[key] = JSON.stringify(todos)
-            //} catch(e) {}
+            } catch(e) {}
         }
 
         return {
