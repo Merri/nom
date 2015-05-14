@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" data-framework="nom">
+    <head>
+        <meta charset="utf-8">
+        <title>NomJS • TodoMVC</title>
+        <link rel="stylesheet" href="node_modules/todomvc-common/base.css" />
+        <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css" />
+    </head>
+    <body>
+        <footer class="info">
+            <p>Double-click to edit a todo</p>
+            <p>Created by <a href="https://github.com/merri">Vesa Piittinen</a></p>
+            <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+        </footer>
+        <script src="node_modules/todomvc-common/base.js"></script>
+        <script src="../nom.js"></script>
+        <script>
+!function(){
+    function createTodoItem(todo) {
+        return {
+            completed: !!todo.completed,
+            title: '' + todo.title
+        }
+    }
+
+    function nomTodos(props) {
+        var nomNewTodo,
+            nomEditTodo,
+            mainChildren,
+            footerChildren
+
+        props = {
+            filter: props.filter || function(){},
+            onChange: props.onChange || function(){},
+            todos: props.todos || []
+        }
+
+        var state = {
+            currentEditItem: null,
+            todos: Array.isArray(props.todos) ? props.todos.map(createTodoItem) : []
+        }
+
+        function notifyChanges() {
+            props.onChange(state.todos.map(createTodoItem))
+        }
+
+        function add(event) {
+            event = event || window.event
+            if (event.keyCode === 13 && nomNewTodo.value !== '') {
+                state.todos.push(createTodoItem({ title: nomNewTodo.value }))
+                notifyChanges()
+                nomNewTodo.value = ''
+            }
+        }
+
+        function countCompleted() {
+            return state.todos.reduce(function(count, item) {
+                return count + item.completed
+            }, 0)
+        }
+
+        function filterTodos(filterName) {
+            switch(filterName) {
+            case 'active':
+                return state.todos.filter(function(item) { return !item.completed })
+            case 'completed':
+                return state.todos.filter(function(item) { return item.completed })
+            }
+            return state.todos
+        }
+
+        function removeCompleted() {
+            state.todos = filterTodos('active')
+            notifyChanges()
+            nomNewTodo.focus()
+        }
+
+        function toggleAll(event) {
+            state.todos.forEach(function(item) {
+                item.completed = event.target.checked
+            })
+            notifyChanges()
+        }
+
+        function nomListItem(item) {
+            if (item.nomEl) return item.nomEl
+
+            var toggle = nom.el('input.toggle', function() {
+                return {
+                    type: 'checkbox',
+                    checked: item.completed,
+                    onchange: function() { item.completed = toggle.checked; notifyChanges() }
+                }
+            })
+
+            var view = nom.el('div.view', [
+                toggle,
+                nom.el('label', function() {
+                    return {
+                        ondblclick: function() { state.currentEditItem = item },
+                        children: item.title
+                    }
+                }),
+                nom.el('button.destroy', {
+                    onclick: function() {
+                        state.todos.splice(state.todos.indexOf(item), 1)
+                        item.nomEl = null
+                        notifyChanges()
+                    }
+                })
+            ])
+
+            return item.nomEl = nom.el('li', function() {
+                var children = [view],
+                    className = ' '
+
+                if (item.completed)
+                    className += 'completed '
+
+                if (state.currentEditItem === item) {
+                    className += 'editing '
+                    children.push(nomEditTodo)
+                    if (document.activeElement !== nomEditTodo && nomEditTodo.parentElement === item.nomEl) {
+                        nomEditTodo.value = ''
+                        nomEditTodo.focus()
+                    }
+                }
+
+                return { className: className.trim(), children: children }
+            })
+        }
+
+        function nomFilterLink(text, filterName) {
+            filterName = filterName || ''
+
+            var href = '#/' + filterName
+
+            return nom.el('a', function() {
+                return {
+                    className: props.filter() === filterName ? 'selected' : '',
+                    href: href,
+                    children: text
+                }
+            })
+        }
+
+        function endEdit() {
+            state.currentEditItem = null
+        }
+
+        function endEditOnEnter(event) {
+            if ((event || window.event).keyCode === 13) endEdit()
+        }
+
+        function updateEdit() {
+            state.currentEditItem.title = nomEditTodo.value
+            notifyChanges()
+        }
+
+        nomEditTodo = nom.el('input.edit', function() {
+            return {
+                onblur: endEdit,
+                oninput: updateEdit,
+                onkeypress: endEditOnEnter,
+                value: state.currentEditItem ? state.currentEditItem.title : ''
+            }
+        })
+
+        mainChildren = [
+            nom.el('input.toggle-all', function() {
+                return {
+                    type: 'checkbox',
+                    checked: countCompleted() === state.todos.length,
+                    onclick: toggleAll
+                }
+            }),
+            nom.el('label', {
+                htmlFor: 'toggle-all',
+                children: 'Mark all as complete'
+            }),
+            nom.el('ul.todo-list', function() {
+                return filterTodos(props.filter()).map(nomListItem)
+            })
+        ]
+
+        footerChildren = [
+            nom.el('span.todo-count', function() {
+                var left = state.todos.length - countCompleted()
+
+                return {children: left + (left === 1 ? ' item left' : ' items left')}
+            }),
+            nom.el('ul.filters', [
+                {li: [nomFilterLink('All')]},
+                {li: [nomFilterLink('Active', 'active')]},
+                {li: [nomFilterLink('Completed', 'completed')]}
+            ]),
+            nom.el('button.clear-completed', function() {
+                return {
+                    onclick: removeCompleted,
+                    children: 'Clear completed',
+                    style: { display: filterTodos('completed').length ? '' : 'none' }
+                }
+            })
+        ]
+
+        return nom.els(
+            {'section.todoapp': [
+                {'header.header': [
+                    {h1: 'todos'},
+                    nomNewTodo = nom.el('input.new-todo', {
+                        placeholder: 'What needs to be done?',
+                        autofocus: true,
+                        onkeypress: add
+                    })
+                ]},
+                {'section.main': function() {
+                    return {
+                        style: { display: state.todos.length ? '' : 'none' },
+                        children: mainChildren
+                    }
+                }},
+                {'footer.footer': function() {
+                    return {
+                        style: { display: state.todos.length ? '' : 'none' },
+                        children: footerChildren
+                    }
+                }}
+            ]}
+        )
+    }
+
+    function getCurrentRoute() {
+        return location.hash.split('/')[1] || ''
+    }
+
+    function Storage(key) {
+        function getItems() {
+            try {
+                if (localStorage[key])
+                    return JSON.parse(localStorage[key])
+            } catch(e) {}
+
+            return []
+        }
+
+        function updateItems(todos) {
+            //try {
+                localStorage[key] = JSON.stringify(todos)
+            //} catch(e) {}
+        }
+
+        return {
+            getItems: getItems,
+            updateItems: updateItems
+        }
+    }
+
+    var storage = new Storage('nom-todos')
+
+    document.body.insertBefore(
+        nom.mount(nomTodos({
+            filter: getCurrentRoute,
+            onChange: storage.updateItems,
+            todos: storage.getItems()
+        })),
+        document.body.firstChild
+    )
+}()
+        </script>
+    </body>
+</html>
