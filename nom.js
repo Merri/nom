@@ -1,9 +1,9 @@
-/* Nom version 0.0.10, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.11, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(window, isBrowser, hasNode, hasRAF) {
     'use strict';
     // return at least something when outside browser environment or if no requestAnimationFrame available...
     function returnNull() { return null; }
-    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.10' };
+    var nom = { el: returnNull, els: returnNull, mount: returnNull, supported: isBrowser && hasRAF, version: '0.0.11' };
     // Nom depends on requestAnimationFrame
     if (!isBrowser || !hasRAF) return nom;
     // optimize minified JS size
