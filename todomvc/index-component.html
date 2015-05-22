@@ -3,6 +3,11 @@
     <head>
         <meta charset="utf-8">
         <title>NomJS • TodoMVC</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <![endif]-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-shim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-sham.min.js"></script>
         <link rel="stylesheet" href="node_modules/todomvc-common/base.css" />
         <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css" />
     </head>
@@ -233,35 +238,48 @@
         return location.hash.split('/')[1] || ''
     }
 
-    function Storage(key) {
-        function getItems() {
-            try {
-                if (localStorage[key])
-                    return JSON.parse(localStorage[key])
-            } catch(e) {}
+    function ArrayStorage(key, delayWhenBusy) {
+        var dataToStore,
+            timeout
 
-            return []
+        delayWhenBusy = Math.max(~~delayWhenBusy, 0)
+
+        function store() {
+            try {
+                localStorage[key] = JSON.stringify(dataToStore)
+                dataToStore = undefined
+            } catch(e) {}
+            timeout = undefined
         }
 
-        function updateItems(todos) {
+        this.getArray = function() {
+            var data
+
+            if (dataToStore)
+                return dataToStore.slice(0)
+
             try {
-                localStorage[key] = JSON.stringify(todos)
+                data = JSON.parse(localStorage[key] || '[]')
             } catch(e) {}
+
+            return Array.isArray(data) ? data : []
         }
 
-        return {
-            getItems: getItems,
-            updateItems: updateItems
+        this.setArray = function(data) {
+            if (!Array.isArray(data)) return
+            dataToStore = data
+            clearTimeout(timeout)
+            timeout = setTimeout(store, timeout == null ? 0 : delayWhenBusy)
         }
     }
 
-    var storage = new Storage('nom-todos')
+    var storage = new ArrayStorage('nom-todos', 100)
 
     document.body.insertBefore(
         nom.mount(nomTodos({
             filter: getCurrentRoute,
-            onChange: storage.updateItems,
-            todos: storage.getItems()
+            onChange: storage.setArray,
+            todos: storage.getArray()
         })),
         document.body.firstChild
     )
