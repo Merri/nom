@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" data-framework="nom">
+    <head>
+        <meta charset="utf-8">
+        <title>NomJS • TodoMVC</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <![endif]-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-shim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-sham.min.js"></script>
+        <link rel="stylesheet" href="node_modules/todomvc-common/base.css" />
+        <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css" />
+    </head>
+    <body>
+        <footer class="info">
+            <p>Double-click to edit a todo</p>
+            <p>Created by <a href="https://github.com/merri">Vesa Piittinen</a></p>
+            <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+        </footer>
+        <script src="node_modules/todomvc-common/base.js"></script>
+        <script src="../requestAnimationFrame-polyfill.js"></script>
+        <script src="../nom.js"></script>
+        <script src="js/models/todo.js"></script>
+        <script src="js/models/storage.js"></script>
+        <script src="js/controllers/todo.js"></script>
+        <script src="js/views/todo.js"></script>
+        <script src="js/app.js"></script>
+    </body>
+</html>
