@@ -19,6 +19,7 @@
         var Array = window.Array,
             document = window.document,
             flatten = Array.prototype.concat,
+            Node = window.Node,
             // Object.prototype.toString.call() is the most compatible way to see if something is a function
             objFn = '[object Function]',
             objToStr = Object.prototype.toString,
@@ -29,13 +30,12 @@
             htmlToDOM = document.createElement('div'),
             // helpers for IE
             ieActive = {},
-            ltIE10 = 'all' in document && !window.atob,
-            oninput = 'oninput';
+            ltIE10 = 'all' in document && !window.atob;
 
     // patch IE9 oninput event bug (does not trigger if deleting value) and use the same code to add IE8- support
     function ieoninput(node) {
         // check that all conditions are met, escape as quickly as possible because this may be called often
-        if (!node || !node.render || !('value' in node) || !(oninput in node)) return;
+        if (!node || !node.render || !('value' in node) || !('oninput' in node)) return;
         // are we tracking the right element?
         if (ieActive.node !== node) {
             ieActive.node = node;
@@ -88,7 +88,7 @@
             if (!props.hasOwnProperty(prop)) continue;
             value = props[prop];
             // oninput DOM Level 1 event support for IE8 and below in few lines of code
-            if (ltIE10 && prop === oninput && !(oninput in obj)) {
+            if (ltIE10 && prop === 'oninput' && !('oninput' in obj)) {
                 obj.onpropertychange = function() {
                     if (window.event.propertyName === 'value') ieoninput(obj);
                 }
@@ -181,7 +181,7 @@
 
     if (isBrowser) {
         // takes element or creates an element, applies properties to the element and returns the element
-        nom.el = function nomElement(element, props, staticProps) {
+        nom.el = function(element, props, staticProps) {
             var cssishParts, index = 0;
             // functions need no processing here
             if (canTypeOfFn ? typeof props !== fn : objToStr.call(props) !== objFn) {
@@ -226,7 +226,7 @@
         };
 
         // takes nodes, HTML strings, object notation elements or arrays of the aforementioned, returns a fragment
-        nom.els = function nomElements(nodes) {
+        nom.els = function(nodes) {
             var fragment = document.createDocumentFragment(), node, nodeIndex = 0, nodeTag;
             // create a real array out of everything given
             nodes = flatten.apply([], arguments);
@@ -259,7 +259,7 @@
         };
 
         // takes a fragment or same stuff as els, mounts them for automatic render, returns a fragment
-        nom.mount = function nomMount(fragment) {
+        nom.mount = function(fragment) {
             var mounts = [], node, nodes = [], nodeIndex = 0;
             // make sure we work with a fragment; support skipping a call to els
             if (hasNode ? !(fragment instanceof Node && fragment.nodeType === 11) : fragment.nodeType !== 11)
@@ -273,7 +273,7 @@
                     mounts.push(node);
             }
             // ends rendering and removes all original children from the document and returns the fragment
-            fragment.unmount = function nomUnmount() {
+            fragment.unmount = function() {
                 // stop render execution by clearing all active mounts
                 mounts.length = 0;
                 // restore all nodes back to the original fragment
@@ -313,7 +313,7 @@
     if (typeof exports === 'object')
         module.exports = nom;
     // support AMD
-    else if (typeof define === 'function' && define.amd)
+    else if (typeof define === fn && define.amd)
         define(function() { return nom; });
     // support browser
     else
