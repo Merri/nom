@@ -1,4 +1,4 @@
-/* Nom version 0.0.12, @license MIT, (c) 2015 Vesa Piittinen */
+/* Nom version 0.0.13, @license MIT, (c) 2015 Vesa Piittinen */
 ;(function(window, isBrowser, hasNode, hasRAF) {
     'use strict';
 
@@ -10,7 +10,7 @@
         els: returnNull,
         mount: returnNull,
         supported: isBrowser && hasRAF,
-        version: '0.0.12'
+        version: '0.0.13'
     };
 
     // var declares the variables to our scope even if isBrowser === false (but these variables will be undefined)
@@ -146,17 +146,22 @@
                 // remove the nodes that are no longer with us
                 while (nodesToRemove.length)
                     obj.removeChild(nodesToRemove.pop());
+                // create a fragment to host multiple nodes, otherwise use the parent node
+                var fra = (nodes.length - nodeIndex > 0) ? document.createDocumentFragment() : obj;
                 // add nodes that are missing
                 while (nodes.length >= nodeIndex) {
                     // add text node
-                    if (typeof node === 'string') obj.appendChild(document.createTextNode(node));
+                    if (typeof node === 'string') fra.appendChild(document.createTextNode(node));
                     // add DOM element
-                    else if (hasNode ? node instanceof Node : node.nodeType > 0) obj.appendChild(node);
+                    else if (hasNode ? node instanceof Node : node.nodeType > 0) fra.appendChild(node);
                     // add anything else even if supporting this may be a bit dangerous
-                    else obj.appendChild(nom.els(node));
+                    else fra.appendChild(nom.els(node));
 
                     node = nodes[nodeIndex++];
                 }
+                // see if there is a fragment to be added to the main node object
+                if (fra !== obj && fra.childNodes.length)
+                    obj.appendChild(fra);
             // skip functions
             } else if (canTypeOfFn ? typeof obj[prop] === fn : objToStr.call(obj[prop]) === objFn);
             // apply subproperties like style if value is an object
