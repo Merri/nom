@@ -29,12 +29,13 @@
             htmlToDOM = document.createElement('div'),
             // helpers for IE
             ieActive = {},
-            ltIE10 = 'all' in document && !window.atob;
+            ltIE10 = 'all' in document && !window.atob,
+            oninput = 'oninput';
 
     // patch IE9 oninput event bug (does not trigger if deleting value) and use the same code to add IE8- support
     function ieoninput(node) {
         // check that all conditions are met, escape as quickly as possible because this may be called often
-        if (!node || !node.render || !('value' in node) || !('oninput' in node)) return;
+        if (!node || !node.render || !('value' in node) || !(oninput in node)) return;
         // are we tracking the right element?
         if (ieActive.node !== node) {
             ieActive.node = node;
@@ -87,7 +88,7 @@
             if (!props.hasOwnProperty(prop)) continue;
             value = props[prop];
             // oninput DOM Level 1 event support for IE8 and below in few lines of code
-            if (ltIE10 && prop === 'oninput' && !('oninput' in obj)) {
+            if (ltIE10 && prop === oninput && !(oninput in obj)) {
                 obj.onpropertychange = function() {
                     if (window.event.propertyName === 'value') ieoninput(obj);
                 }
