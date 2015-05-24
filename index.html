@@ -13,7 +13,7 @@
         <style>
 html {
     background: #222;
-    color: #EEE;
+    color: #CDE;
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 }
 
@@ -44,22 +44,31 @@ a:active {
 
 h1 {
     background: #68B;
+    background: #68B linear-gradient(rgba(160, 224, 255, 0.5), rgba(160, 224, 255, 0));
+    box-shadow: 0 -1em 3em #68B,
+        inset 0 -1em 3em rgba(34, 34, 34, 0.25);
     font-size: 2em;
+    line-height: 1;
     margin: 0;
     padding: 1em;
     text-align: center;
 }
 
 img[alt="NomJS"] {
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
     max-width: 100%;
     vertical-align: middle;
-    transform: scale(0.75);
 }
 
 dl {
     background: #112;
     border: 1px solid #79A;
     border-radius: 0.25em;
+    color: #CDD;
     margin: 1em;
     padding: 1em;
 }
@@ -72,23 +81,118 @@ dt {
 dd {
     margin: 0.25em 0 0.75em;
 }
+
+table {
+    background: #112;
+    border: 1px solid #79A;
+    border-radius: 0.25em;
+    border-spacing: 0;
+    color: #CDD;
+    margin: 1em;
+}
+
+tbody {
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(160, 224, 255, 0.05);
+}
+
+th {
+    padding: 0.5em;
+    text-align: left;
+}
+
+td {
+    padding: 0.5em;
+    white-space: nowrap;
+}
+
+th:first-child {
+    width: 100%;
+}
+
         </style>
     </head>
     <body>
         <h1>
-            <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="225" width="720" />
+            <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="185" width="592" /><br />
+            <small>1.5 kB DOM library • browser only • compact syntax</small>
         </h1>
         <main>
-            <h2>Examples</h2>
+            <p>Nom is performant, minimalist (3 public methods), dependency free library for working with the DOM.</p>
+            <h2>Avoid invalid expectations</h2>
+            <p>NomJS is not a framework, Nom is no <a href="https://lhorie.github.io/mithril/index.html">Mithril</a>, <a href="https://muut.com/riotjs/">Riot</a> or <a href="http://facebook.github.io/react/">React</a>.</p>
+            <p>React calls itself a library, but it tells you how to structure most of your code. Both Riot and Mithril are honest frameworks which are minimalist and performant. Riot forces you to the build tool world: Mithril does not. Yet Mithril also gives full suite of application building tools.</p>
+            <p>And then we have Nom, and Nom only does DOM. You can write your code whichever way you want using whatever paradigm you see fit. Nom simply gives you DOM elements and helps you render your stuff.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Nom</th>
+                        <th>Mithril</th>
+                        <th>Riot</th>
+                        <th>React</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Easy to build DOM</th>
+                        <td>Yes!</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td title="It can be hard to create DL/DT/DD like structures in React">Yes*</td>
+                    </tr>
+                    <tr>
+                        <th>Compact syntax</th>
+                        <td>Yes!</td>
+                        <td>Yes</td>
+                        <td>Very</td>
+                        <td title="React's JSX files tend to end up being quite verbose">Nope*</td>
+                    </tr>
+                    <tr>
+                        <th>Fancy HTML syntax</th>
+                        <td>Nope!</td>
+                        <td title="Mithril can be modded to work with JSX">Nope*</td>
+                        <td title="Riot has custom TAG files">Yes*</td>
+                        <td title="Riot has custom JSX files">Yes*</td>
+                    </tr>
+                    <tr>
+                        <th>Virtual DOM</th>
+                        <td>Nope!</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    <tr>
+                        <th>Router</th>
+                        <td>Nope!</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td title="React-router plugin">Nope*</td>
+                    </tr>
+                    <tr>
+                        <th>Size (minified + gzip)</th>
+                        <td>1.5 kB (0.0.13)</td>
+                        <td>7.0 kB (0.2.0)</td>
+                        <td>4.75 kB (2.1.0)</td>
+                        <td>34 kB (0.13.3)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>NomJS is very fast. Nom's internal code is built using pattern repetition and classic procedural style, avoiding slow code style, and preferring fastest known methods when possible. This kind of coding style doesn't make Nom as small as it could be, yet Nom is very small.</p>
+            <h2>Compatibility</h2>
+            <p>NomJS is build for ES5 and browser standards. If you know DOM, you know Nom. Nom just makes DOM easy.</p>
+            <p>Nom can run in browser engines as old as IE5 as long as a <code>requestAnimationFrame</code> polyfill and <code>es5-shim</code> are provided.</p>
+            <h2>Nom Examples</h2>
             <dl>
-                <dt><a href="./demo/todo.html">Nom todo</a></dt>
-                <dd>Based on <a href="http://muut.github.io/riotjs/demo/">Riot 2 todo</a>.</dd>
-                <dt><a href="./demo/login-oninput.html">Nom login &amp; <code>oninput</code> demo</a></dt>
-                <dd>Nom adds the useful <code>oninput</code> event to IE8 and below, and patches IE9 bug.</dd>
                 <dt><a href="./todomvc/">Nom TodoMVC</a></dt>
                 <dd>Based on <a href="http://todomvc.com/">TodoMVC 1.3</a>.</dd>
                 <dt><a href="./todomvc/index-component.html">Nom TodoMVC without MVC pattern</a></dt>
                 <dd>Same as above with roughly 100 lines less code, but can be considered more messy.</li>
+                <dt><a href="./demo/todo.html">Nom todo</a></dt>
+                <dd>Based on <a href="http://muut.github.io/riotjs/demo/">Riot 2 todo</a>.</dd>
+                <dt><a href="./demo/login-oninput.html">Nom login &amp; <code>oninput</code> demo</a></dt>
+                <dd>Nom adds the useful <code>oninput</code> event to IE8 and below, and patches IE9 bug.</dd>
             </ul>
         </main>
     </body>
