@@ -52,7 +52,20 @@ h1 {
     line-height: 1;
     margin: 0;
     padding: 1em;
+    position: relative;
     text-align: center;
+}
+
+h1:after {
+    border-radius: 0 0 100% 100%;
+    box-shadow: 0 1em 2em #68B;
+    content: '';
+    bottom: 1em;
+    left: 0;
+    right: 0;
+    top: 0;
+    position: absolute;
+    z-index: -1;
 }
 
 img[alt="NomJS"] {
