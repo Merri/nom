@@ -82,6 +82,30 @@ img[alt="NomJS"] {
     vertical-align: middle;
 }
 
+blockquote {
+    background: #112;
+    border: 1px solid #79A;
+    border-radius: 0.25em;
+    color: #CDD;
+    font-style: italic;
+    margin: 1em auto;
+    padding: 1em;
+    width: 27em;
+}
+
+blockquote::before {
+    display: block;
+    height: 0px;
+    content: "“";
+    margin-left: -0.95em;
+    font: italic 400%/1 Cochin,Georgia,"Times New Roman",serif;
+    color: #8CF;
+}
+
+blockquote *:first-child {
+    margin-top: 0;
+}
+
 dl {
     background: #112;
     border: 1px solid #79A;
@@ -170,6 +194,10 @@ th:first-child {
             </ul>
             <h2 id="#invalid-expectations">Avoid invalid expectations</h2>
             <p>NomJS is not a framework, Nom is no <a href="https://lhorie.github.io/mithril/index.html">Mithril</a>, <a href="https://muut.com/riotjs/">Riot</a> or <a href="http://facebook.github.io/react/">React</a>.</p>
+            <blockquote>
+                <p>It seems that perfection is attained, not when there is nothing more to add, but when there is nothing more to take away.</p>
+                <footer>— <a href="http://en.wikipedia.org/wiki/Antoine_de_Saint-Exup%C3%A9ry">Antoine de Saint Exupéry</a></footer>
+            </blockquote>
             <p>React calls itself a library, but it tells you how to structure most of your code. Both Riot and Mithril are honest frameworks which are minimalist and performant. Riot forces you to the build tool world: Mithril does not. Yet Mithril also gives full suite of application building tools.</p>
             <p>And then we have Nom, and Nom only does DOM. You can write your code whichever way you want using whatever paradigm you see fit. Nom simply gives you DOM elements and helps you render your stuff.</p>
             <table>
@@ -233,7 +261,7 @@ th:first-child {
             <p>Nom's elements are created once and no actual virtual tree is built on each render. Instead you provide a property update function (if necessary) which is called on each render for each element that has such a function. Changes are made only if there are changes to do. Nom also gives a special treatment to <code>children</code> property: you can pass an array of DOM elements and changes are made to DOM as array's content changes.</p>
             <p>In short: binding data to elements happens outside of Nom's scope and Nom does not control it.</p>
             <h2 id="compatibility">Compatibility</h2>
-            <p>NomJS is build for ES5 and browser standards. If you know DOM, you know Nom. Nom just makes DOM easy.</p>
+            <p>NomJS is built for ES5 and browser standards. If you know DOM, you know Nom. Nom just makes DOM easy.</p>
             <p>Nom can run in browser engines as old as IE5 as long as a <code>requestAnimationFrame</code> polyfill and <code>es5-shim</code> are provided.</p>
             <h2 id="examples">Nom Examples</h2>
             <dl>
