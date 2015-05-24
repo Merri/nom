@@ -68,6 +68,10 @@ h1:after {
     z-index: -1;
 }
 
+img {
+    max-width: 100%;
+}
+
 img[alt="NomJS"] {
     -ms-interpolation-mode: nearest-neighbor;
     image-rendering: -moz-crisp-edges;
@@ -75,7 +79,6 @@ img[alt="NomJS"] {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: -webkit-pixelated;
     image-rendering: pixelated;
-    max-width: 100%;
     vertical-align: middle;
 }
 
@@ -241,7 +244,65 @@ th:first-child {
                 <dd>Based on <a href="http://muut.github.io/riotjs/demo/">Riot 2 todo</a>.</dd>
                 <dt><a href="./demo/login-oninput.html">Nom login &amp; <code>oninput</code> demo</a></dt>
                 <dd>Nom adds the useful <code>oninput</code> event to IE8 and below, and patches IE9 bug.</dd>
-            </ul>
+            </dl>
+            <h2 id="todomvc-benchmark">TodoMVC benchmarks</h2>
+            <p>Remember that these benchmarks are a better indicator of browser vs. browser performance. A browser side optimization can greatly vary the results.</p>
+            <p>The most important thing to notice is that both Nom and Mithril are amazingly fast. React is so slow that I didn't want to include it in these benchmarks (being roughly 10x slower than the Mithril TodoMVC 1.3 implementation).</p>
+            <h3>TodoMVC: 250 items</h3>
+            <dl>
+                <dt>250 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/250-chrome-43.png" /></dd>
+                <dt>250 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/250-firefox-38.png" /></dd>
+                <dt>250 items: Internet Explorer 11</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/250-ie-11.png" /></dd>
+            </dl>
+            <h3>TodoMVC: 500 items</h3>
+            <dl>
+                <dt>500 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/500-chrome-43.png" /></dd>
+                <dt>500 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/500-firefox-38.png" /></dd>
+                <dt>500 items: Internet Explorer 11</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/500-ie-11.png" /></dd>
+            </dl>
+            <h3>TodoMVC: 1,000 items</h3>
+            <dl>
+                <dt>1000 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/1000-chrome-43.png" /></dd>
+                <dt>1000 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/1000-firefox-38.png" /></dd>
+                <dt>1000 items: Internet Explorer 11</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/1000-ie-11.png" /></dd>
+            </dl>
+            <h3>TodoMVC: 2,500 items</h3>
+            <p>Only the two fastest implementations fighting from now on.</p>
+            <dl>
+                <dt>2500 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/2500-chrome-43.png" /></dd>
+                <dt>2500 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/2500-firefox-38.png" /></dd>
+                <dt>2500 items: Internet Explorer 11</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/2500-ie-11.png" /></dd>
+            </dl>
+            <h3>TodoMVC: 5,000 items</h3>
+            <dl>
+                <dt>5000 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/5000-chrome-43.png" /></dd>
+                <dt>5000 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/5000-firefox-38.png" /></dd>
+                <dt>5000 items: Internet Explorer 11</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/5000-ie-11.png" /></dd>
+            </dl>
+            <h3>TodoMVC: 10,000 items</h3>
+            <p>Mithril's Chrome-friendly optimizations for thousands of elements kick in.</p>
+            <dl>
+                <dt>10000 items: Chrome 43</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/10000-chrome-43.png" /></dd>
+                <dt>10000 items: Firefox 38</dt>
+                <dd><img alt="" src="todomvc/benchmark-screenshots/10000-firefox-38.png" /></dd>
+            </dl>
+            <p>All benchmarks ran on Windows 7 64-bit.</p>
         </main>
     </body>
 </html>
