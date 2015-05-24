@@ -28,7 +28,7 @@
         }
     }
 
-    var viewRenderer = {
+    var renderHelper = {
         filterLink: function(text, filterName) {
             filterName = filterName || ''
 
@@ -42,11 +42,12 @@
                 }
             })
         },
+        listItems: [],
         toListItem: function(item, index) {
-            var listItem = viewComponent.listItems[index]
+            var listItem = renderHelper.listItems[index]
 
             if (!listItem) {
-                listItem = viewComponent.listItems[index] = { data: item }
+                listItem = renderHelper.listItems[index] = { data: item }
                 listItem.view = nom.el('div.view', [
                     nom.el('input.toggle', function() {
                         return {
@@ -95,7 +96,6 @@
     }
 
     var viewComponent = {
-        listItems: [],
         newTodo: nom.el('input.new-todo', function() {
             return {
                 placeholder: 'What needs to be done?',
@@ -127,7 +127,7 @@
                 children: 'Mark all as complete'
             }),
             nom.el('ul.todo-list', function() {
-                return app.controller.visibleItems().map(viewRenderer.toListItem)
+                return app.controller.visibleItems().map(renderHelper.toListItem)
             })
         ],
         footer: [
@@ -137,9 +137,9 @@
                 return {children: remaining + (remaining === 1 ? ' item left' : ' items left')}
             }),
             nom.el('ul.filters', [
-                {li: [viewRenderer.filterLink('All')]},
-                {li: [viewRenderer.filterLink('Active', 'active')]},
-                {li: [viewRenderer.filterLink('Completed', 'completed')]}
+                {li: [renderHelper.filterLink('All')]},
+                {li: [renderHelper.filterLink('Active', 'active')]},
+                {li: [renderHelper.filterLink('Completed', 'completed')]}
             ]),
             nom.el('button.clear-completed', function() {
                 return {

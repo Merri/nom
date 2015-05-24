@@ -36,5 +36,5 @@
         }
     }
 
-    app.storage = new ArrayStorage('nom-todos', 100)
+    app.storage = new ArrayStorage('nom+mvc-todos', 100)
 }()
