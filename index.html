@@ -99,6 +99,7 @@ tbody tr:nth-child(odd) {
 }
 
 th {
+    color: #8AC;
     padding: 0.5em;
     text-align: left;
 }
@@ -112,16 +113,43 @@ th:first-child {
     width: 100%;
 }
 
+.looks-like-a-button {
+    background: #182;
+    border: 2px solid #222;
+    border-radius: 0.25em;
+    box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.125),
+        inset 0 0 1px 2px #1A3;
+    color: #CDE;
+    display: inline-block;
+    font-size: 24px;
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 1em 0 0.5em;
+    padding: 0.5em 1.5em;
+    text-align: center;
+}
+.looks-like-a-button:link,
+.looks-like-a-button:visited {
+    color: #CDE;
+}
+
         </style>
     </head>
     <body>
         <h1>
             <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="185" width="592" /><br />
-            <small>1.5 kB DOM library • browser only • compact syntax</small>
+            <a class="looks-like-a-button" href="https://github.com/Merri/nom">Download @ GitHub</a><br />
+            <small>1.5 kB DOM library • browser only • compact syntax</small><br />
         </h1>
         <main>
             <p>Nom is performant, minimalist (3 public methods), dependency free library for working with the DOM.</p>
-            <h2>Avoid invalid expectations</h2>
+            <ul>
+                <li><a href="#invalid-expectations">Avoid invalid expectations</a></li>
+                <li><a href="#no-virtual-dom">Why no Virtual DOM?</a></li>
+                <li><a href="#compatibility">Compatibility</a></li>
+                <li><a href="#examples">Examples</a></li>
+            </ul>
+            <h2 id="#invalid-expectations">Avoid invalid expectations</h2>
             <p>NomJS is not a framework, Nom is no <a href="https://lhorie.github.io/mithril/index.html">Mithril</a>, <a href="https://muut.com/riotjs/">Riot</a> or <a href="http://facebook.github.io/react/">React</a>.</p>
             <p>React calls itself a library, but it tells you how to structure most of your code. Both Riot and Mithril are honest frameworks which are minimalist and performant. Riot forces you to the build tool world: Mithril does not. Yet Mithril also gives full suite of application building tools.</p>
             <p>And then we have Nom, and Nom only does DOM. You can write your code whichever way you want using whatever paradigm you see fit. Nom simply gives you DOM elements and helps you render your stuff.</p>
@@ -180,10 +208,15 @@ th:first-child {
                 </tbody>
             </table>
             <p>NomJS is very fast. Nom's internal code is built using pattern repetition and classic procedural style, avoiding slow code style, and preferring fastest known methods when possible. This kind of coding style doesn't make Nom as small as it could be, yet Nom is very small.</p>
-            <h2>Compatibility</h2>
+            <h2 id="no-virtual-dom">Why no Virtual DOM?</h2>
+            <p>Virtual DOM is like the coolest thing that is around here right now. NomJS doesn't have it, because frankly it isn't necessary.</p>
+            <p>Mithril and React work for the most part so that you build a single render function or a view that gets executed. Then a virtual DOM tree is built and diffed against existing DOM. Nom is different here.</p>
+            <p>Nom's elements are created once and no actual virtual tree is built on each render. Instead you provide a property update function (if necessary) which is called on each render for each element that has such a function. Changes are made only if there are changes to do. Nom also gives a special treatment to <code>children</code> property: you can pass an array of DOM elements and changes are made to DOM as array's content changes.</p>
+            <p>In short: binding data to elements happens outside of Nom's scope and Nom does not control it.</p>
+            <h2 id="compatibility">Compatibility</h2>
             <p>NomJS is build for ES5 and browser standards. If you know DOM, you know Nom. Nom just makes DOM easy.</p>
             <p>Nom can run in browser engines as old as IE5 as long as a <code>requestAnimationFrame</code> polyfill and <code>es5-shim</code> are provided.</p>
-            <h2>Nom Examples</h2>
+            <h2 id="examples">Nom Examples</h2>
             <dl>
                 <dt><a href="./todomvc/">Nom TodoMVC</a></dt>
                 <dd>Based on <a href="http://todomvc.com/">TodoMVC 1.3</a>.</dd>
