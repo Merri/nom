@@ -1,0 +1,95 @@
+<!DOCTYPE html><!--[if IE]><![endif]-->
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>NomJS</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <![endif]-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-shim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.0/es5-sham.min.js"></script>
+        <script src="./requestAnimationFrame-polyfill.js"></script>
+        <script src="./nom.js"></script>
+        <style>
+html {
+    background: #222;
+    color: #EEE;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+html,body {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin: 0 auto;
+    max-width: 45em;
+    padding: 1em;
+    position: relative;
+}
+
+a:link,
+a:visited {
+    color: #8BF;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus,
+a:active {
+    outline: none;
+    text-decoration: underline;
+}
+
+h1 {
+    background: #68B;
+    font-size: 2em;
+    margin: 0;
+    padding: 1em;
+    text-align: center;
+}
+
+img[alt="NomJS"] {
+    max-width: 100%;
+    vertical-align: middle;
+    transform: scale(0.75);
+}
+
+dl {
+    background: #112;
+    border: 1px solid #79A;
+    border-radius: 0.25em;
+    margin: 1em;
+    padding: 1em;
+}
+
+dt {
+    font-size: 1.25em;
+    font-weight: 800;
+}
+
+dd {
+    margin: 0.25em 0 0.75em;
+}
+        </style>
+    </head>
+    <body>
+        <h1>
+            <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="225" width="720" />
+        </h1>
+        <main>
+            <h2>Examples</h2>
+            <dl>
+                <dt><a href="./demo/todo.html">Nom todo</a></dt>
+                <dd>Based on <a href="http://muut.github.io/riotjs/demo/">Riot 2 todo</a>.</dd>
+                <dt><a href="./demo/login-oninput.html">Nom login &amp; <code>oninput</code> demo</a></dt>
+                <dd>Nom adds the useful <code>oninput</code> event to IE8 and below, and patches IE9 bug.</dd>
+                <dt><a href="./todomvc/">Nom TodoMVC</a></dt>
+                <dd>Based on <a href="http://todomvc.com/">TodoMVC 1.3</a>.</dd>
+                <dt><a href="./todomvc/index-component.html">Nom TodoMVC without MVC pattern</a></dt>
+                <dd>Same as above with roughly 100 lines less code, but can be considered more messy.</li>
+            </ul>
+        </main>
+    </body>
+</html>
