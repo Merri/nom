@@ -1,3 +1,5 @@
+# NOTE: This is experimental library that qualifies best as a Proof Of Concept!
+
 <img alt="NomJS" src="http://merri.net/github-nomjs_720x225.png" height="225" width="720" />
 
 > Nom (or nom.js or NomJS) is a new DOM library. It has been inspired by both [React](http://facebook.github.io/react/) and [Riot 2](https://muut.com/riotjs/), but Nom only does DOM, and does it only in browser. Thus Nom focuses on doing just one thing right instead of becoming more of a framework. Nom gives you no help to making isomorphic sites, tells you in no way how you should go with your routing (standalone library or custom solution can do it better anyway) and doesn't practically force you into using build tools. Nom won't make you happy if you're following the trends!
